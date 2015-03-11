@@ -1,0 +1,29 @@
+PROJECT_NAME=TinyCsv
+
+INT_DIR=../../../../_Output/GCC/$(PROJECT_NAME)/
+OUT_DIR=../../../../bin/GCC/
+
+TEST_DIR     =../../Tests/
+SAMPLES_DIR  =../../Samples/
+CONVERTER_DIR=../../Converter/
+
+CC=g++
+
+CFLAGS=-c -o $(INT_DIR)
+LDFLAGS=
+
+CsvTest: $(TEST_DIR)main.o \
+         $(TEST_DIR)TestA.o \
+         $(TEST_DIR)TestB.o \
+         $(TEST_DIR)TestC.o
+	$(CC) $(LFLAGS) main.o TestA.o CsvTest
+
+main.o: IntDir 
+	$(CC) $(CFLAGS) -o $(INT_DIR)main.o $(SAMPLES_DIR)main.cpp
+TestA.o: IntDir 
+	$(CC) $(CFLAGS) -o $(INT_DIR)main.o  $(SAMPLES_DIR)TestA.cpp		
+
+IntDir:
+	mkdir -p $(INT_DIR)
+OutDir:
+	mkdir -p $(OUT_DIR)

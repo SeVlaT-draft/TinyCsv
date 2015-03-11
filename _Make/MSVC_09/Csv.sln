@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CsvSamples", "CsvSamples.vcproj", "{B9980B0E-2D0F-4B41-BD8F-8AF71E4EC70A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CsvTest", "CsvTest.vcproj", "{7248004F-93C2-40F2-927F-4E65438A62A5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CsvConverter", "CsvConverter.vcproj", "{2B302D8E-0424-4403-92B7-B90501B1837A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B9980B0E-2D0F-4B41-BD8F-8AF71E4EC70A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B9980B0E-2D0F-4B41-BD8F-8AF71E4EC70A}.Debug|Win32.Build.0 = Debug|Win32
+		{B9980B0E-2D0F-4B41-BD8F-8AF71E4EC70A}.Release|Win32.ActiveCfg = Release|Win32
+		{B9980B0E-2D0F-4B41-BD8F-8AF71E4EC70A}.Release|Win32.Build.0 = Release|Win32
+		{7248004F-93C2-40F2-927F-4E65438A62A5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7248004F-93C2-40F2-927F-4E65438A62A5}.Debug|Win32.Build.0 = Debug|Win32
+		{7248004F-93C2-40F2-927F-4E65438A62A5}.Release|Win32.ActiveCfg = Release|Win32
+		{7248004F-93C2-40F2-927F-4E65438A62A5}.Release|Win32.Build.0 = Release|Win32
+		{2B302D8E-0424-4403-92B7-B90501B1837A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2B302D8E-0424-4403-92B7-B90501B1837A}.Debug|Win32.Build.0 = Debug|Win32
+		{2B302D8E-0424-4403-92B7-B90501B1837A}.Release|Win32.ActiveCfg = Release|Win32
+		{2B302D8E-0424-4403-92B7-B90501B1837A}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

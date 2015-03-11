@@ -1,0 +1,2 @@
+This folder contains projects and solution files for
+Microsoft Visual Studio 2008 (v.9).

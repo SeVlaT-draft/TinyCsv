@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="Csv"
+	OutputDirectory="..\..\..\..\bin\MSVC_090\$(ConfigurationName)\$(ProjectName)"
+	IntermediateDirectory="..\..\..\..\_output\MSVC_090\$(ConfigurationName)\$(ProjectName)"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		PreprocessorDefinitions="WIN32;_CONSOLE"
+		WarningLevel="3"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		GenerateDebugInformation="true"
+		SubSystem="1"
+		TargetMachine="1"
+	/>
+</VisualStudioPropertySheet>

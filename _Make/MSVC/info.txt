@@ -1,0 +1,5 @@
+This folder contains NO Microsoft Visual Studio projects!
+
+It contains only s PROPS files, that used in MSVC projects.
+
+Please, look for MSVC projects in MSVC_nn folders.
