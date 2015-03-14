@@ -72,8 +72,10 @@ class TStreamSource {
  public:
   TCharTag GetChar(TChar &ch)
   {
-    if (m_Stream >> ch) return CharTag(ch, m_bct, m_cct);
-    return cEof;
+    const int nCh=m_Stream.get();
+    if (!m_Stream) return cEoF;
+    ch=static_cast<CH>(nCh);
+    return CharTag(ch, m_bct, m_cct);
   }
 
  private:
@@ -97,6 +99,7 @@ class TInput {
  public:
   bool NextField()
   {
+    if (m_Fsm.Cur().bStop) return false;
     if (m_cntRec.IsStopped()) return false;
 
     m_cntFld.Over();
@@ -114,6 +117,7 @@ class TInput {
   }
 
  public:
+  bool IsEoC() const   { return m_cntFld.IsStopped(); }
   bool IsEoR() const   { return m_cntRec.IsStopped(); }
 
   int GetRecordNumber() const { return m_cntRec.Cur(); }
@@ -130,15 +134,13 @@ class TInput {
   bool Iteration(TChar ch, TCharTag ct)
   {
     m_Fsm.Next(ct);
-    return Iteration(ch, ct, m_Fsm.Cur());
+    return Iteration(ch, m_Fsm.Cur());
   }
 
  private:
-  bool Iteration(      TChar     ch,
-                       TCharTag  ct,
-                 const TAction  &Action)
+  bool Iteration(TChar ch, const TAction &Action)
   {
-    m_Field.Next(ch, ct, Action.bNew, Action.bAdd);
+    m_Field.Next(ch, Action.BufAction);
 
     m_cntFld.Next(Action.bEoC);
     m_cntRec.Next(Action.bEoR);

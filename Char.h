@@ -11,8 +11,8 @@ enum TCharTag {
   cQte,   // Quotation mark (usually double quote ("), or single ('))
   cWsp,   // Whitespace symbol (space or tab)
   cSmb,   // Any other allowed symbol
-  cEol,   // End of line (usually 0x0D, 0x0A or their combination)
-  cEof,   // End of file 
+  cEoL,   // End of line (usually 0x0D, 0x0A or their combination)
+  cEoF,   // End of file 
 
   cLast
 };
@@ -64,7 +64,7 @@ TCharTag CharTag(      CH                ch,
   if (cct.IsQte(ch)) return cQte;
 
   if (bct.IsWsp(ch)) return cWsp;
-  if (bct.IsEol(ch)) return cEol;
+  if (bct.IsEol(ch)) return cEoL;
 
   if (!bct.IsNotASymb(ch)) return cSmb;
 

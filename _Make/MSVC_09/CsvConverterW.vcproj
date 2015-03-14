@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="CsvSamples"
-	ProjectGUID="{B9980B0E-2D0F-4B41-BD8F-8AF71E4EC70A}"
-	RootNamespace="CsvSamples"
+	Name="CsvConverterW"
+	ProjectGUID="{3E3642D1-25BE-44A4-B9B1-B55A8CA3C1FF}"
+	RootNamespace="CsvConverterW"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -19,7 +19,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			ConfigurationType="1"
-			InheritedPropertySheets="..\MSVC\Common.vsprops;..\MSVC\Console.vsprops"
+			InheritedPropertySheets="..\MSVC\Common.vsprops;..\MSVC\Windows.vsprops"
 			CharacterSet="1"
 			>
 			<Tool
@@ -58,6 +58,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="2"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -84,7 +85,7 @@
 		<Configuration
 			Name="Release|Win32"
 			ConfigurationType="1"
-			InheritedPropertySheets="..\MSVC\Common.vsprops;..\MSVC\Console.vsprops"
+			InheritedPropertySheets="..\MSVC\Common.vsprops;..\MSVC\Windows.vsprops"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -126,6 +127,7 @@
 				LinkIncremental="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -159,11 +161,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\Samples\main.cpp"
+				RelativePath="..\..\Converter\CmdLine.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\Samples\Sample.cpp"
+				RelativePath="..\..\Converter\WinMain.cpp"
 				>
 			</File>
 		</Filter>
@@ -173,7 +175,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\Samples\Sample.h"
+				RelativePath="..\..\Converter\CmdLine.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Converter\Types.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Converter\WinTargetVer.h"
 				>
 			</File>
 			<Filter

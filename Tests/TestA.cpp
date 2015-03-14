@@ -12,8 +12,8 @@ using namespace TinyCsv;
 
 
 template <typename DESCR, int N>
-void TestArr0(const TCharTag (&In)[N],
-              const TFlags  (&Out)[N])
+void TestArr0(const TCharTag (&In) [N],
+              const TFlags   (&Out)[N])
 {
   TFsm<DESCR> fsm;
   TChecker<DESCR> Checker;
@@ -35,56 +35,56 @@ void TestArr0(const TCharTag (&In)[N],
 }
 
 template <int N>
-void TestArr(const TCharTag (&In)[N],
-             const TFlags  (&Out)[N])
+void TestArr(const TCharTag (&In) [N],
+             const TFlags   (&Out)[N])
 {
   TestArr0<TFsmDescr>(In, Out);
 }
 
 void Test0()
 {
-  TCharTag I[]={cSmb, cSmb, cSep, cEof};
-  TFlags   O[]={oNAdd, oAdd,  oEoC, oNEoF};
+  TCharTag I[]={cSmb,  cSmb, cSep, cEoF };
+  TFlags   O[]={oNAdd, oAdd, oEoC, oEoF };
 
   TestArr(I, O);
 }
 
 void Test1()
 {
-  TCharTag I[]={cSmb, cSmb, cEof};
-  TFlags   O[]={oNAdd,  oAdd,  oEoCF};
+  TCharTag I[]={cSmb,  cSmb, cEoF };
+  TFlags   O[]={oNAdd, oAdd, oEoCF};
 
   TestArr(I, O);
 }
 
 void Test2()
 {
-  TCharTag I[]={cWsp, cQte, cSmb, cSmb, cQte,  cEof};
-  TFlags   O[]={oNAdd, oNew,  oAdd,  oAdd,  oNone, oEoCF};
+  TCharTag I[]={cWsp,  cQte, cSmb, cSmb, cQte,  cEoF };
+  TFlags   O[]={oNALW, oNew, oAdd, oAdd, oNone, oEoCF};
 
   TestArr(I, O);
 }
 
 void Test3()
 {
-  TCharTag I[]={cWsp, cQte, cSmb, cQte,  cQte, cSmb, cQte,  cEof};
-  TFlags   O[]={oNAdd, oNew,  oAdd,  oNone, oAdd,  oAdd,  oNone, oEoCF};
+  TCharTag I[]={cWsp,  cQte, cSmb, cQte,  cQte, cSmb, cQte,  cEoF };
+  TFlags   O[]={oNALW, oNew, oAdd, oNone, oAdd, oAdd, oNone, oEoCF};
 
   TestArr(I, O);
 }
 
 void Test4()
 {
-  TCharTag I[]={cQte, cSmb, cQte,  cEol,  cEof};
-  TFlags   O[]={oNew,  oAdd,  oNone, oEoCR, oEoF};
+  TCharTag I[]={cQte, cSmb, cQte,  cEoL,  cEoF};
+  TFlags   O[]={oNew, oAdd, oNone, oEoCR, oEoF};
 
   TestArr(I, O);
 }
 
 void Test5()
 {
-  TCharTag I[]={cQte, cSmb, cQte,  cWsp, cEol, cEof};
-  TFlags   O[]={oNew,  oAdd,  oNone, oEoC, oEoR, oEoF};
+  TCharTag I[]={cQte, cSmb, cQte,  cWsp, cEoL, cEoF};
+  TFlags   O[]={oNew, oAdd, oNone, oEoC, oEoR, oEoF};
 
   TestArr(I, O);
 }

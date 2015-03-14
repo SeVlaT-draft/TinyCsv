@@ -26,13 +26,10 @@ class TField<STRING, false> {
   TCIt End()   const { return m_s.end();   }
 
  public:
-  void Next(TChar    ch,
-            TCharTag,
-            bool     bClear,
-            bool     bAdd)
+  void Next(TChar ch, const TBufAction &BA)
   {
-    if (bClear) m_s=STRING();
-    if (bAdd)   m_s+=ch;
+    if (BA.bNew) m_s=STRING();
+    if (BA.bAdd) m_s+=ch;
   }
 
  private:
@@ -54,19 +51,17 @@ class TField<STRING, true> {
   TCIt End()   const { return Begin()+m_nLength; }
 
  public:
-  void Next(TChar    ch,
-            TCharTag ct,
-            bool     bClear,
-            bool     bAdd)
+  void Next(TChar ch, const TBufAction &BA)
   {
-    if (bClear) {
+    if (BA.bNew) {
       m_s=STRING();
       m_nLength=0;
     }
 
-    if (bAdd) {
-      if (ct==cWsp) {
-        if (!m_s.empty()) m_s+=ch;
+    if (BA.bAdd) {
+      if (BA.bLWsp) {
+      } else if (BA.bTWsp) {
+        m_s+=ch;
       } else {
         m_s+=ch;
         m_nLength=m_s.length();

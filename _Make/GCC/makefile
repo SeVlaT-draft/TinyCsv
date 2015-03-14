@@ -1,6 +1,6 @@
 PROJECT_NAME=CsvTest
 
-OBJ_DIR=../../../../_Output/GCC/$(PROJECT_NAME)/
+OBJ_DIR=../../../../_output/GCC/$(PROJECT_NAME)/
 OUT_DIR=../../../../bin/GCC/
 
 SRC_DIR=../../Tests/
@@ -20,10 +20,14 @@ CsvTest: $(OBJS)
 #.cpp.o:
 #	$(CC) $(CFLAGS) $< -o $@
 
-%.o : %.cpp
+main.o: main.cpp
 	$(CC) $(CFLAGS) $< -o $@
 
-IntDir:
-	mkdir -p $(INT_DIR)
-OutDir:
+#%.o : %.cpp
+#	$(CC) $(CFLAGS) $< -o $@
+
+OBJ_DIR:
+	mkdir -p $(OBJ_DIR)
+
+OUT_DIR:
 	mkdir -p $(OUT_DIR)

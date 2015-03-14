@@ -19,7 +19,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			ConfigurationType="1"
-			InheritedPropertySheets="..\MSVC\Common.vsprops"
+			InheritedPropertySheets="..\MSVC\Common.vsprops;..\MSVC\Console.vsprops"
 			CharacterSet="1"
 			>
 			<Tool
@@ -84,7 +84,7 @@
 		<Configuration
 			Name="Release|Win32"
 			ConfigurationType="1"
-			InheritedPropertySheets="..\MSVC\Common.vsprops"
+			InheritedPropertySheets="..\MSVC\Common.vsprops;..\MSVC\Console.vsprops"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -159,6 +159,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\Converter\CmdLine.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\Converter\main.cpp"
 				>
 			</File>
@@ -168,6 +172,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\..\Converter\CmdLine.h"
+				>
+			</File>
 			<File
 				RelativePath="..\..\Converter\Types.h"
 				>

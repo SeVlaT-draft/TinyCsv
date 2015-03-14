@@ -19,7 +19,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			ConfigurationType="1"
-			InheritedPropertySheets="..\MSVC\Common.vsprops"
+			InheritedPropertySheets="..\MSVC\Common.vsprops;..\MSVC\Console.vsprops"
 			CharacterSet="1"
 			>
 			<Tool
@@ -84,7 +84,7 @@
 		<Configuration
 			Name="Release|Win32"
 			ConfigurationType="1"
-			InheritedPropertySheets="..\MSVC\Common.vsprops"
+			InheritedPropertySheets="..\MSVC\Common.vsprops;..\MSVC\Console.vsprops"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>

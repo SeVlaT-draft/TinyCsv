@@ -25,31 +25,38 @@ enum TFlags {
   oNone = 0x0000,  // Nothing to do
 
 // Buffer operations
-  oNew  = 0x0001,  // Clear field buffer
-  oAdd  = 0x0002,  // Add char to field buffer
+  oNew  = 0x0001,  // Clear buffer
+  oAdd  = 0x0002,  // Add symbol
+
+  oLWsp = 0x0020,  // Leading whitespace
+  oTWsp = 0x0040,  // Whitespace, that may be trailing
 
 // Field
-  oEoC  = 0x0010,  // End-of-Cell, buffer contains field's text
-
-// End marks
-  oEoR  = 0x0020,  // End-of-Row
-
-// Stopped
-// End-of-File
-  oEoF  = 0x0040,  // End-of-File
-
-// Errors
-  oErTx = 0x0100,  // Error in text field
-  oErSt = 0x0200,  // Error in stopped state
-  oErQ0 = 0x0400,  // Error in escaped field (inside quotes)
-  oErQ1 = 0x0800,  // Error in escaped field (after closing quote)
+  oEoC  = 0x0100,  // End-of-Cell, buffer contains field's text
+                
+// End marks    
+  oEoR  = 0x0200,  // End-of-Row
+                
+// Stopped      
+// End-of-File  
+  oEoF  = 0x0400,  // End-of-File
+                
+// Errors       
+  oErTx = 0x1000,  // Error in text field
+  oErSt = 0x2000,  // Error in stopped state
+  oErQ0 = 0x4000,  // Error in escaped field (inside quotes)
+  oErQ1 = 0x8000,  // Error in escaped field (after closing quote)
 
 // Combined flags
+  oALW  = oAdd | oLWsp,
+  oATW  = oAdd | oTWsp,
+
   oNAdd = oNew | oAdd,
+  oNALW = oNew | oALW,
+  oNATW = oNew | oATW,
 
   oNEoC = oNew | oEoC,
   oNEoR = oNew | oEoR,
-  oNEoF = oNew | oEoF,
 
   oEoCR = oEoC | oEoR,
   oEoCF = oEoC | oEoF,
@@ -60,9 +67,32 @@ enum TFlags {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-struct TAction {
-  bool bAdd;
+struct TBufAction {
   bool bNew;
+  bool bAdd;
+
+  bool bLWsp;
+  bool bTWsp;
+
+  explicit TBufAction(TFlags o)
+   : bNew  ((o & oNew )!=0),
+     bAdd  ((o & oAdd )!=0),
+     bLWsp ((o & oLWsp)!=0),
+     bTWsp ((o & oTWsp)!=0)  {} //!!!!!
+
+  TFlags O() const
+  {
+    const unsigned int dw = (bNew  ? oNew : 0) |
+                            (bAdd  ? oAdd : 0) |
+                            (bLWsp ? oLWsp: 0) |
+                            (bTWsp ? oTWsp: 0);
+
+    return static_cast<TFlags>(dw);
+  }
+};
+
+struct TAction {
+  TBufAction BufAction;
 
   bool bEoC;
   bool bEoR;
@@ -77,8 +107,7 @@ struct TAction {
   bool bStop;
 
   explicit TAction(TFlags o)
-   : bAdd  ((o & oAdd  )!=0),
-     bNew  ((o & oNew  )!=0),
+   : BufAction(o),
      bEoC  ((o & oEoC )!=0),
      bEoR  ((o & oEoR )!=0),
      bEoF  ((o & oEoF )!=0),
@@ -91,9 +120,9 @@ struct TAction {
 
   TFlags O() const
   {
-    const unsigned int dw = (bAdd  ? oAdd : 0) |
-                            (bNew  ? oNew : 0) |
-                            (bEoC  ? oEoC : 0) |
+    const unsigned int dwBA = BufAction.O();
+
+    const unsigned int dw = (bEoC  ? oEoC : 0) |
                             (bEoR  ? oEoR : 0) |
                             (bEoF  ? oEoF : 0) |
                             (bErTxt? oErTx: 0) |
@@ -101,7 +130,7 @@ struct TAction {
                             (bErQu1? oErQ1: 0) |
                             (bErEof? oErSt: 0);
 
-    return static_cast<TFlags>(dw);
+    return static_cast<TFlags>(dw | dwBA);
   }
 };
 
@@ -124,40 +153,40 @@ class TFsmDescr {
        Action(f)
     {
       Next[cSep]=&sSep;  Next[cQte]=&sQte;  Next[cWsp]=&sWsp;
-      Next[cSmb]=&sSmb;  Next[cEol]=&sEol;  Next[cEof]=&sEof;
+      Next[cSmb]=&sSmb;  Next[cEoL]=&sEol;  Next[cEoF]=&sEof;
     }
 
   };
 
  private:
   TState sStart, sEoC, sEoR, sEoCR, sNEoC, sNEoR;
-  TState sWsp0, sWsp, sTxt0, sTxt;
+  TState sWsp0, sWsp, sTxt0, sTxt, sTWsp;
   TState sQHead, sQTxt, sQuote, sQTail;
-  TState sNEoF, sEoF, sEoCF;
+  TState sEoF, sEoCF;
   TState sErTxt, sErEof, sErQu0, sErQu1;
 
  public:
   TFsmDescr()
    :
-   //                          cSep    cQte    cWsp    cSmb    cEol    cEof
-      sStart("sStart", oNone,   sNEoC,  sQHead, sWsp0,  sTxt0,  sNEoR,  sNEoF ), // Remove?
-      sEoC  ("sEoC",   oEoC,    sNEoC,  sQHead, sWsp0,  sTxt0,  sNEoR,  sNEoF ),
-      sNEoC ("sNEoC",  oNEoC,   sNEoC,  sQHead, sWsp0,  sTxt0,  sNEoR,  sNEoF ),
-      sEoR  ("sEoR",   oEoR,    sNEoC,  sQHead, sWsp0,  sTxt0,  sNEoR,  sNEoF ),
-      sNEoR ("sNEoR",  oNEoR,   sNEoC,  sQHead, sWsp0,  sTxt0,  sNEoR,  sNEoF ),
-      sEoCR ("sEoCR",  oEoCR,   sNEoC,  sQHead, sWsp0,  sTxt0,  sNEoR,  sNEoF ),
+   //                           cSep    cQte    cWsp    cSmb    cEol    cEof
+      sStart("sStart", oNone,   sNEoC,  sQHead, sWsp0,  sTxt0,  sNEoR,  sEoF  ), // Remove?
+      sEoC  ("sEoC",   oEoC,    sNEoC,  sQHead, sWsp0,  sTxt0,  sNEoR,  sEoF  ),
+      sNEoC ("sNEoC",  oNEoC,   sNEoC,  sQHead, sWsp0,  sTxt0,  sNEoR,  sEoF  ),
+      sEoR  ("sEoR",   oEoR,    sNEoC,  sQHead, sWsp0,  sTxt0,  sNEoR,  sEoF  ),
+      sNEoR ("sNEoR",  oNEoR,   sNEoC,  sQHead, sWsp0,  sTxt0,  sNEoR,  sEoF  ),
+      sEoCR ("sEoCR",  oEoCR,   sNEoC,  sQHead, sWsp0,  sTxt0,  sNEoR,  sEoF  ),
 
-      sWsp0 ("sWsp0",  oNAdd,   sEoC,   sQHead, sWsp,   sTxt,   sEoCR,  sEoCF ),
-      sWsp  ("sWsp",   oAdd,    sEoC,   sQHead, sWsp,   sTxt,   sEoCR,  sEoCF ),
-      sTxt0 ("sTxt0",  oNAdd,   sEoC,   sErTxt, sTxt,   sTxt,   sEoCR,  sEoCF ),
-      sTxt  ("sTxt",   oAdd,    sEoC,   sErTxt, sTxt,   sTxt,   sEoCR,  sEoCF ),
+      sWsp0 ("sWsp0",  oNALW,   sEoC,   sQHead, sWsp,   sTxt,   sEoCR,  sEoCF ),
+      sWsp  ("sWsp",   oALW,    sEoC,   sQHead, sWsp,   sTxt,   sEoCR,  sEoCF ),
+      sTxt0 ("sTxt0",  oNAdd,   sEoC,   sErTxt, sTWsp,  sTxt,   sEoCR,  sEoCF ),
+      sTxt  ("sTxt",   oAdd,    sEoC,   sErTxt, sTWsp,  sTxt,   sEoCR,  sEoCF ),
+      sTWsp ("sTWsp",  oATW,    sEoC,   sErTxt, sTWsp,  sTxt,   sEoCR,  sEoCF ),
 
       sQHead("sQHead", oNew,    sQTxt,  sQuote, sQTxt,  sQTxt,  sQTxt,  sErQu0),
       sQTxt ("sQTxt",  oAdd,    sQTxt,  sQuote, sQTxt,  sQTxt,  sQTxt,  sErQu0),
       sQuote("sQuote", oNone,   sEoC,   sQTxt,  sQTail, sErQu1, sEoCR,  sEoCF ),
       sQTail("sQTail", oEoC,    sStart, sErQu1, sQTail, sErQu1, sEoR,   sEoF  ),
 
-      sNEoF ("sNEoF",  oNEoF,   sErEof, sErEof, sErEof, sErEof, sErEof, sErEof),
       sEoF  ("sEoF",   oEoF,    sErEof, sErEof, sErEof, sErEof, sErEof, sErEof),
       sEoCF ("sEoCF",  oEoCF,   sErEof, sErEof, sErEof, sErEof, sErEof, sErEof),
 
