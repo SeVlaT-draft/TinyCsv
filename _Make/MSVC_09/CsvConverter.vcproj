@@ -184,6 +184,10 @@
 				Name="TinyCsv"
 				>
 				<File
+					RelativePath="..\..\Action.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Char.h"
 					>
 				</File>

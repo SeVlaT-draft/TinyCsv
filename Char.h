@@ -6,6 +6,7 @@
 
 namespace TinyCsv {
 
+//!!!! Make cEoF = 0
 enum TCharTag {
   cSep,   // Separator (usually comma, semicolon, space, tab or | )
   cQte,   // Quotation mark (usually double quote ("), or single ('))

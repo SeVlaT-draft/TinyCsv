@@ -10,12 +10,14 @@ template <typename DESCR>
 class TChecker {
  public:
   typedef typename DESCR::TState TState;
+  typedef typename DESCR::TInput TInput;
+  static const int nInputCardinality=DESCR::nCharCatCount;
 
  public:
   TChecker(): m_nStateCount(0) {}
 
  public:
-  bool CheckState(const TState *ps)
+  bool operator()(const TState *ps)
   {
     int iState=m_nStateCount;
 
@@ -43,21 +45,34 @@ class TChecker {
     return true;
   }
 
+  bool AddStates(const TState* const (&arrNext)[nInputCardinality])
+  {
+    for (int i=0; i<nInputCardinality; ++i)
+      if (!AddState(arrNext[i])) return false;
+
+    return true;
+  }
+
   bool ProcessState(const TState *ps)
   {
     if (!ps) return false;
     const TState &s=*ps;
 
     if (!CheckState(s)) return false;
+    return AddStates(s.Next);
 
-    for (int i=0; i<sizeof(s.Next)/sizeof(s.Next[0]); ++i)
-      if (!AddState(s.Next[i])) return false;
-
-    return true;
   }
 
   bool CheckState(const TState &s) const
   {
+    return true;
+  }
+
+  bool CheckInput(TInput (&arr)[nInputCardinality]) const
+  {
+    for (int i=0; i<nInputCardinality; ++i)
+      if (arr[i]!=i) return false;
+
     return true;
   }
 

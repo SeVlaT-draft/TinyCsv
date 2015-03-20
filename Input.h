@@ -87,19 +87,12 @@ class TStreamSource {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-template <typename FSM, typename SOURCE, typename FIELD>
+template <typename FSM>
 class TInput {
-  typedef typename SOURCE::TChar TChar;
-
- public:
-  TInput(SOURCE &Source, FIELD &Field)
-   : m_Source(Source),
-     m_Field(Field) {}
-
  public:
   bool NextField()
   {
-    if (m_Fsm.Cur().bStop) return false;
+    if (m_Fsm.Action().bStop) return false;
     if (m_cntRec.IsStopped()) return false;
 
     m_cntFld.Over();
@@ -108,7 +101,7 @@ class TInput {
 
   bool NextRecord()
   {
-    if (m_Fsm.Cur().bStop) return false;
+    if (m_Fsm.Action().bStop) return false;
 
     m_cntRec.Over();
     m_cntFld=TCounter();
@@ -124,23 +117,23 @@ class TInput {
   int GetFieldNumber()  const { return m_cntFld.Cur(); }
 
  public:
-  bool Iteration()
+  template <typename SOURCE, typename CELL>
+  bool Iteration(SOURCE &Source, CELL &Cell)
   {
+    typedef typename SOURCE::TChar TChar;
     TChar ch=0;
-    const TCharTag ct=m_Source.GetChar(ch);
-    return Iteration(ch, ct);
+    const TCharTag ct=Source.GetChar(ch);
+    return Iteration(ch, ct, Cell);
   }
 
-  bool Iteration(TChar ch, TCharTag ct)
+  template <typename CH, typename CELL>
+  bool Iteration(CH ch, TCharTag ct, CELL &Cell)
   {
     m_Fsm.Next(ct);
-    return Iteration(ch, m_Fsm.Cur());
-  }
 
- private:
-  bool Iteration(TChar ch, const TAction &Action)
-  {
-    m_Field.Next(ch, Action.BufAction);
+    const TAction &Action=m_Fsm.Action();
+
+    Cell.Next(ch, Action.BufAction);
 
     m_cntFld.Next(Action.bEoC);
     m_cntRec.Next(Action.bEoR);
@@ -151,13 +144,7 @@ class TInput {
   }
 
  private:
-  SOURCE &m_Source;
-
- private:
   FSM m_Fsm;
-
- private:
-  FIELD &m_Field;
 
  private:
   TCounter m_cntFld;

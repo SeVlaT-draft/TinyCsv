@@ -15,7 +15,7 @@ void TestC0()
   TFsm<TFsmDescr> fsm;
   TChecker<TFsmDescr> Checker;
 
-  assert(Checker.CheckState(fsm.GetCurState()));
+  assert(Checker(fsm.GetCurState()));
 }
 
 void TestC()
