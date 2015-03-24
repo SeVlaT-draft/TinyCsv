@@ -7,7 +7,8 @@
 
 #include "../Fsm.h"
 #include "../Input.h"
-#include "../Field.h"
+#include "../Cell.h"
+#include "../Source.h"
 
 using namespace TinyCsv;
 
@@ -16,14 +17,14 @@ void Sample(std::istream &is)
   typedef TFsm<TFsmDescr> TFsm1;
 
   typedef TStreamSource<std::istream> TSource;
-  typedef TField<std::string, false>  TField1;
+  typedef  TCellStr<std::string, false>  TField1;
 
   TSource Source(is);
   TField1 Field;
   TInput<TFsm1, TSource, TField1> Input(Source, Field);
 
   Input.ReadField();
-  Input.NextRecord();
+  Input.NextRow();
 }
 
 void Sample()

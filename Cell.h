@@ -1,6 +1,7 @@
-#ifndef Field_h_already_included__04_03_2015__F60E2D0
-#define Field_h_already_included__04_03_2015__F60E2D0
+#ifndef Cell_h_already_included__22_03_2015__C8F78E0
+#define Cell_h_already_included__22_03_2015__C8F78E0
 //
+// SeVlaT, 22.03.2015
 // SeVlaT, 04.03.2015
 //
 
@@ -12,11 +13,11 @@ namespace TinyCsv {
 // std::string, std::wstring, QString
 
 template <typename STRING, bool TRIMSPACES>
-class TField;
+class  TCellStr;
 
 ////////////////////////////////////////////////////////////////////////////////
 template <typename STRING>
-class TField<STRING, false> {
+class  TCellStr<STRING, false> {
  public:
   typedef typename STRING::value_type     TChar;
   typedef typename STRING::const_iterator TCIt;
@@ -38,13 +39,13 @@ class TField<STRING, false> {
 
 ////////////////////////////////////////////////////////////////////////////////
 template <typename STRING>
-class TField<STRING, true> {
+class  TCellStr<STRING, true> {
  public:
   typedef typename STRING::value_type     TChar;
   typedef typename STRING::const_iterator TCIt;
 
  public:
-  TField(): m_nLength(0) {}
+  TCellStr(): m_nLength(0) {}
 
  public:
   TCIt Begin() const { return m_s.begin();       }

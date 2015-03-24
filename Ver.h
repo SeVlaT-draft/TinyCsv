@@ -5,7 +5,7 @@
 //
 
 #define TINYCSV_VERSION_MAJOR 0
-#define TINYCSV_VERSION_MINOR 4
+#define TINYCSV_VERSION_MINOR 5
 
 namespace TinyCsv {
 

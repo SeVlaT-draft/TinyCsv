@@ -9,7 +9,8 @@
 
 #include "../Fsm.h"
 #include "../Input.h"
-#include "../Field.h"
+#include "../Cell.h"
+#include "../Source.h"
 
 using namespace TinyCsv;
 
@@ -25,10 +26,17 @@ class TTester {
 
   ~TTester()
   {
+    std::cout << std::endl;
     assert(m_szRes[m_nCellTotal]==0);
   }
 
  public:
+  void RowBegin(int nRow)
+    { std::cout << nRow << ":|"; }
+
+  void RowEnd()
+    { std::cout << std::endl; }
+
   template <typename ITI>
   void Cell(ITI iiB, ITI iiE, int nCellInRow)
   {
@@ -47,64 +55,121 @@ class TTester {
   int m_nCellTotal;
 };
 
-template <bool TRIMSPACES, int N>
-void TestStream1(      std::istream  &is,
-                 const char* const  (&szRes)[N])
-{
+
+template <typename CELL>
+class TCsvIterator {
+ public:
+  template <typename SOURCE, typename VISITOR>
+  bool Cell(SOURCE &Source, VISITOR &Visitor)
+  {
+    while (m_Input.Iteration(Source, m_Cell));
+
+    if (m_Input.IsEoC())
+      Visitor.Cell(m_Cell.Begin(), m_Cell.End(), m_Input.GetCellNumber());
+
+    return m_Input.NextCell();
+  }
+
+  template <typename SOURCE, typename VISITOR>
+  bool Row(SOURCE &Source, VISITOR &Visitor)
+  {
+    Visitor.RowBegin(m_Input.GetRowNumber());
+    while (Cell(Source, Visitor)) ;
+    Visitor.RowEnd();
+    return m_Input.NextRow();
+  }
+
+  template <typename SOURCE, typename VISITOR>
+  void operator()(SOURCE &Source, VISITOR &Visitor)
+  {
+    while (Row(Source, Visitor)) ;
+  }
+
+
+  template <typename VISITOR>
+  bool operator()(int       ch,
+                  TCharTag  ct,
+                  VISITOR  &Visitor)
+  {
+    if (m_Input.Iteration(ch, ct, m_Cell)) return true;
+
+    const int nRow=m_Input.GetRowNumber();
+    const int nCell=m_Input.GetCellNumber();
+
+    if (nCell==0) Visitor.RowBegin(nRow);
+
+    if (m_Input.IsEoC())
+      Visitor.Cell(m_Cell.Begin(), m_Cell.End(), nCell);
+
+    if (m_Input.NextCell()) return true;
+
+    Visitor.RowEnd();
+
+    return m_Input.NextRow();
+  }
+
+
+ private:
   typedef TFsm<TFsmDescr> TFsm1;
+  TInput<TFsm1> m_Input;
 
-  typedef TStreamSource<std::istream> TSource;
-  typedef TField<std::string, TRIMSPACES>  TField1;
-
-  TSource Source(is);
-  TField1 Field;
-  TInput<TFsm1> Input;
-
-  TTester<N> Tester(szRes);
-
-  TCharTag ct=cEoF;
-  do {
-    char ch=is.get();
-  } while (ct!=cEoF);
+ private:
+  CELL m_Cell;
 };
 
 template <bool TRIMSPACES, int N>
 void TestStream0(      std::istream  &is,
                  const char* const  (&szRes)[N])
 {
-  typedef TFsm<TFsmDescr> TFsm1;
-
-  typedef TStreamSource<std::istream> TSource;
-  typedef TField<std::string, TRIMSPACES>  TField1;
-
-  TSource Source(is);
-  TField1 Field;
-  TInput<TFsm1> Input;
-
+  TCsvIterator<TCellStr<std::string, TRIMSPACES> > It;
   TTester<N> Tester(szRes);
 
+  TStreamSource<std::istream> Source(is);
+
+  It(Source, Tester);
+}
+
+template <bool TRIMSPACES, int N>
+void TestStream1(      std::istream  &is,
+                 const char* const  (&szRes)[N])
+{
+  TCsvIterator<TCellStr<std::string, TRIMSPACES> > It;
+  TTester<N> Tester(szRes);
+
+  TBaseCharTraitsA bct;
+  TCsvCharTraitsA  cct;
+
+  TCharTag ct=cEoF;
   do {
-    const int nRow=Input.GetRecordNumber();
-    std::cout << nRow << ":|";
+    const int ch=is.get();
+    ct=CharTagEof(ch, bct, cct);
 
-    do {
-      while (Input.Iteration(Source, Field));
+    if (!It(ch, ct, Tester)) return;
+  } while (ct!=cEoF);
+};
 
-      if (Input.IsEoC()) {
-        Tester.Cell(Field.Begin(), Field.End(), Input.GetFieldNumber());
-      }
-    } while (Input.NextField());
-    std::cout << std::endl;
-  } while (Input.NextRecord());
-  std::cout << std::endl;
+template <bool TRIMSPACES, int N>
+void TestStream0(const std::string  &sSrc,
+                 const char* const (&szRes)[N])
+{
+  std::stringstream ss(sSrc);
+  TestStream0<TRIMSPACES, N>(ss, szRes);
+}
+
+template <bool TRIMSPACES, int N>
+void TestStream1(const std::string  &sSrc,
+                 const char* const (&szRes)[N])
+{
+  std::stringstream ss(sSrc);
+  TestStream1<TRIMSPACES, N>(ss, szRes);
 }
 
 template <bool TRIMSPACES, int N>
 void TestStream(const std::string  &sSrc,
                 const char* const (&szRes)[N])
 {
-  std::stringstream ss(sSrc);
-  TestStream0<TRIMSPACES, N>(ss, szRes);
+  TestStream0<TRIMSPACES, N>(sSrc, szRes);
+  TestStream1<TRIMSPACES, N>(sSrc, szRes);
 }
 
 template <int N>
@@ -120,6 +185,7 @@ void TestStream(const std::string  &sSrc,
 
   std::cout << std::endl;
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 void TestB0()
 {

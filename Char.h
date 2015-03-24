@@ -8,12 +8,12 @@ namespace TinyCsv {
 
 //!!!! Make cEoF = 0
 enum TCharTag {
+  cEoF,   // End of file 
+  cEoL,   // End of line (usually 0x0D, 0x0A or their combination)
   cSep,   // Separator (usually comma, semicolon, space, tab or | )
   cQte,   // Quotation mark (usually double quote ("), or single ('))
   cWsp,   // Whitespace symbol (space or tab)
   cSmb,   // Any other allowed symbol
-  cEoL,   // End of line (usually 0x0D, 0x0A or their combination)
-  cEoF,   // End of file 
 
   cLast
 };
@@ -23,10 +23,12 @@ template<typename CH>
 struct TBaseCharTraits {
   typedef CH TChar;
 
-  static bool IsWsp(CH ch) { return ch==0x09 || ch==0x20; }
-  static bool IsEol(CH ch) { return ch==0x0D || ch==0x0A; }
+  static bool IsWsp(int ch) { return ch==0x09 || ch==0x20; }
+  static bool IsEol(int ch) { return ch==0x0D || ch==0x0A; }
 
-  static bool IsNotASymb(CH ch) { return false; }
+  static bool IsEoF(int ch) { return ch==std::char_traits<CH>::eof(); }
+
+  static bool IsNotASymb(int ch) { return false; }
 };
 
 typedef TBaseCharTraits<char>    TBaseCharTraitsA;
@@ -40,8 +42,8 @@ struct TCsvCharTraits {
   CH chSep;
   CH chQte;
 
-  bool IsSep(CH ch) const { return ch==chSep; }
-  bool IsQte(CH ch) const { return ch==chQte; }
+  bool IsSep(int ch) const { return ch==chSep; }
+  bool IsQte(int ch) const { return ch==chQte; }
 
   TCsvCharTraits()
    : chSep(';'), chQte('"') {}
@@ -54,10 +56,9 @@ typedef TCsvCharTraits<char>    TCsvCharTraitsA;
 typedef TCsvCharTraits<wchar_t> TCsvCharTraitsW;
 
 ////////////////////////////////////////////////////////////////////////////////
-template<typename CH,
-         typename BASE_CHAR_TRAITS,
+template<typename BASE_CHAR_TRAITS,
          typename CSV_CHAR_TRAITS>
-TCharTag CharTag(      CH                ch,
+TCharTag CharTag(      int               ch,
                  const BASE_CHAR_TRAITS &bct,
                  const CSV_CHAR_TRAITS  &cct)
 {
@@ -70,6 +71,16 @@ TCharTag CharTag(      CH                ch,
   if (!bct.IsNotASymb(ch)) return cSmb;
 
   return cSmb;
+}
+
+template<typename BASE_CHAR_TRAITS,
+         typename CSV_CHAR_TRAITS>
+TCharTag CharTagEof(      int               ch,
+                    const BASE_CHAR_TRAITS &bct,
+                    const CSV_CHAR_TRAITS  &cct)
+{
+  if (bct.IsEoF(ch)) return cEoF;
+  return CharTag(ch, bct, cct);
 }
 
 }

@@ -18,6 +18,7 @@
     <ClCompile Include="..\..\Tests\z.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Action.h" />
     <ClInclude Include="..\..\Char.h" />
     <ClInclude Include="..\..\Csv.h" />
     <ClInclude Include="..\..\Debug.h" />
@@ -26,6 +27,7 @@
     <ClInclude Include="..\..\Fsm.h" />
     <ClInclude Include="..\..\Input.h" />
     <ClInclude Include="..\..\Output.h" />
+    <ClInclude Include="..\..\Source.h" />
     <ClInclude Include="..\..\Tests\FsmChecker.h" />
     <ClInclude Include="..\..\Tests\Test.h" />
     <ClInclude Include="..\..\Ver.h" />

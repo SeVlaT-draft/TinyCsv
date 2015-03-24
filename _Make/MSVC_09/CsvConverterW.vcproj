@@ -194,6 +194,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Cell.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Char.h"
 					>
 				</File>
@@ -210,10 +214,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\Field.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\Fsm.h"
 					>
 				</File>
@@ -223,6 +223,10 @@
 				</File>
 				<File
 					RelativePath="..\..\Output.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Source.h"
 					>
 				</File>
 				<File

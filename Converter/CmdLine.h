@@ -22,11 +22,26 @@
 // /L <int>     Align left int Width
 // /N           No alignment
 
-bool ParseCmdLine(int       argc,
-                  const char* const argv[],
-                  TOptions &Options);
+template <typename CH>
+class TCmdLine {
+ public:
+  typedef const char* TPStr;
 
-bool ParseCmdLine(const char *szCmdLine,
-                  TOptions &Options);
+ public:
+  bool Parse(      int    argc,
+             const TPStr *argv,
+                   TOptions<CH> &Options);
+
+  bool Parse(const CH *szCmdLine,
+             TOptions<CH> &Options);
+};
+
+bool ParseCmdLine(int       argc,
+                  const CH* const *argv,
+                  TOptions<CH> &Options);
+
+template <typename CH>
+bool ParseCmdLine(const CH *szCmdLine,
+                  TOptions<CH> &Options);
 
 #endif

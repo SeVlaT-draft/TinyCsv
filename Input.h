@@ -53,44 +53,10 @@ class TCounter {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-template <typename STREAM,
-          typename CH=char,
-          typename BASE_CHAR_TRAITS=TBaseCharTraits<CH>,
-          typename CSV_CHAR_TRAITS=TCsvCharTraits<CH> >
-class TStreamSource {
- public:
-  typedef CH TChar;
-
- public:
-  explicit TStreamSource(      STREAM           &Stream,
-                         const BASE_CHAR_TRAITS &bct=BASE_CHAR_TRAITS(),
-                         const CSV_CHAR_TRAITS  &cct=CSV_CHAR_TRAITS())
-   : m_Stream(Stream),
-     m_bct(bct),
-     m_cct(cct) {}
-
- public:
-  TCharTag GetChar(TChar &ch)
-  {
-    const int nCh=m_Stream.get();
-    if (!m_Stream) return cEoF;
-    ch=static_cast<CH>(nCh);
-    return CharTag(ch, m_bct, m_cct);
-  }
-
- private:
-  STREAM &m_Stream;
-
- private:
-  BASE_CHAR_TRAITS m_bct;
-  CSV_CHAR_TRAITS  m_cct;
-};
-
-////////////////////////////////////////////////////////////////////////////////
 template <typename FSM>
 class TInput {
  public:
-  bool NextField()
+  bool NextCell()
   {
     if (m_Fsm.Action().bStop) return false;
     if (m_cntRec.IsStopped()) return false;
@@ -99,7 +65,7 @@ class TInput {
     return true;
   }
 
-  bool NextRecord()
+  bool NextRow()
   {
     if (m_Fsm.Action().bStop) return false;
 
@@ -113,8 +79,8 @@ class TInput {
   bool IsEoC() const   { return m_cntFld.IsStopped(); }
   bool IsEoR() const   { return m_cntRec.IsStopped(); }
 
-  int GetRecordNumber() const { return m_cntRec.Cur(); }
-  int GetFieldNumber()  const { return m_cntFld.Cur(); }
+  int GetRowNumber() const { return m_cntRec.Cur(); }
+  int GetCellNumber()  const { return m_cntFld.Cur(); }
 
  public:
   template <typename SOURCE, typename CELL>

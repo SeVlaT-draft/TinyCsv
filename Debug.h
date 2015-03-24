@@ -18,18 +18,6 @@
 
 namespace TinyCsv {
 
-template<typename INDEX>
-struct TSuccessiveIndex {
-  template<int I0, int I1, int I2, int I3, int I4, int I5>
-  class IndexShouldBeSuccessive {};
-
-  template<INDEX I0, INDEX I1, INDEX I2, INDEX I3, INDEX I4, INDEX I5>
-  static IndexShouldBeSuccessive<I0, I1, I2, I3, I4, I5> Head()
-  { return IndexShouldBeSuccessive<I0, I1, I2, I3, I4, I5>(); }
-
-  TSuccessiveIndex(IndexShouldBeSuccessive<0, 1, 2, 3, 4, 5>) {}
-};
-
 }
 
 #endif

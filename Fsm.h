@@ -6,6 +6,7 @@
 
 #include "Char.h"
 #include "Action.h"
+
 #include "Debug.h"
 
 namespace TinyCsv {
@@ -22,51 +23,64 @@ class TFsmDescr {
     TAction Action;
     const TState *Next[nCharCatCount];
 
+    template <typename ST>
     TState(const char *szN, TActionFlags sf,
-           const TState &sSep, const TState &sQte, const TState &sWsp,
-           const TState &sSmb, const TState &sEol, const TState &sEof)
+           const ST &sEof, const ST &sEol, const ST &sSep,
+           const ST &sQte, const ST &sWsp, const ST &sSmb)
      : szName(szN),
        Action(sf)
     {
-      Next[cSep]=&sSep;  Next[cQte]=&sQte;  Next[cWsp]=&sWsp;
-      Next[cSmb]=&sSmb;  Next[cEoL]=&sEol;  Next[cEoF]=&sEof;
+      Set(cEoF, sEof);
+      Set(cEoL, sEol);
+      Set(cSep, sSep);
+      Set(cQte, sQte);
+      Set(cWsp, sWsp);
+      Set(cSmb, sSmb);
     }
 
+   private:
+    void Set(TCharTag ct, const TState &s)
+    {
+      Next[ct]=&s;
+    }
+
+    void Set(TCharTag ct0, TCharTag ct1)
+    {
+      TINY_CSV_ASSERT(ct0==ct1);
+      Next[ct0]=this;
+    }
   };
 
  private:
+  const TState sHead; // A dummy state, just to be a header for transition table
   const TState sStart, sEoC, sEoR, sEoCR, sNEoC, sNEoR;
   const TState sWsp0, sWsp, sTxt0, sTxt, sTWsp;
   const TState sQHead, sQTxt, sQuote, sQTail;
   const TState sEoF, sEoCF;
   const TState sErTxt, sErEof, sErQu0, sErQu1;
 
- private:
-  typedef TSuccessiveIndex<TCharTag> Tbl;
-  const Tbl Trans;
-
  public:
   TFsmDescr()
    :
-      Trans (Tbl::Head<         cSep,   cQte,   cWsp,   cSmb,   cEoL,   cEoF  >()),
+      sHead ("sHead",  oNone,   cEoF,   cEoL,   cSep,   cQte,   cWsp,   cSmb  ),
 
-      sStart("sStart", oNone,   sNEoC,  sQHead, sWsp0,  sTxt0,  sNEoR,  sEoF  ),
-      sEoC  ("sEoC",   oEoC,    sNEoC,  sQHead, sWsp0,  sTxt0,  sNEoR,  sEoF  ),
-      sNEoC ("sNEoC",  oNEoC,   sNEoC,  sQHead, sWsp0,  sTxt0,  sNEoR,  sEoF  ),
-      sEoR  ("sEoR",   oEoR,    sNEoC,  sQHead, sWsp0,  sTxt0,  sNEoR,  sEoF  ),
-      sNEoR ("sNEoR",  oNEoR,   sNEoC,  sQHead, sWsp0,  sTxt0,  sNEoR,  sEoF  ),
-      sEoCR ("sEoCR",  oEoCR,   sNEoC,  sQHead, sWsp0,  sTxt0,  sNEoR,  sEoF  ),
+      sStart("sStart", oNone,   sEoF,   sNEoR,  sNEoC,  sQHead, sWsp0,  sTxt0 ),
+      sEoC  ("sEoC",   oEoC,    sEoF,   sNEoR,  sNEoC,  sQHead, sWsp0,  sTxt0 ),
+      sNEoC ("sNEoC",  oNEoC,   sEoF,   sNEoR,  sNEoC,  sQHead, sWsp0,  sTxt0 ),
+      sEoR  ("sEoR",   oEoR,    sEoF,   sNEoR,  sNEoC,  sQHead, sWsp0,  sTxt0 ),
+      sNEoR ("sNEoR",  oNEoR,   sEoF,   sNEoR,  sNEoC,  sQHead, sWsp0,  sTxt0 ),
+      sEoCR ("sEoCR",  oEoCR,   sEoF,   sNEoR,  sNEoC,  sQHead, sWsp0,  sTxt0 ),
 
-      sWsp0 ("sWsp0",  oNALW,   sEoC,   sQHead, sWsp,   sTxt,   sEoCR,  sEoCF ),
-      sWsp  ("sWsp",   oALW,    sEoC,   sQHead, sWsp,   sTxt,   sEoCR,  sEoCF ),
-      sTxt0 ("sTxt0",  oNAdd,   sEoC,   sErTxt, sTWsp,  sTxt,   sEoCR,  sEoCF ),
-      sTxt  ("sTxt",   oAdd,    sEoC,   sErTxt, sTWsp,  sTxt,   sEoCR,  sEoCF ),
-      sTWsp ("sTWsp",  oATW,    sEoC,   sErTxt, sTWsp,  sTxt,   sEoCR,  sEoCF ),
+      sWsp0 ("sWsp0",  oNALW,   sEoCF,  sEoCR,  sEoC,   sQHead, sWsp,   sTxt  ),
+      sWsp  ("sWsp",   oALW,    sEoCF,  sEoCR,  sEoC,   sQHead, sWsp,   sTxt  ),
+      sTxt0 ("sTxt0",  oNAdd,   sEoCF,  sEoCR,  sEoC,   sErTxt, sTWsp,  sTxt  ),
+      sTxt  ("sTxt",   oAdd,    sEoCF,  sEoCR,  sEoC,   sErTxt, sTWsp,  sTxt  ),
+      sTWsp ("sTWsp",  oATW,    sEoCF,  sEoCR,  sEoC,   sErTxt, sTWsp,  sTxt  ),
 
-      sQHead("sQHead", oNew,    sQTxt,  sQuote, sQTxt,  sQTxt,  sQTxt,  sErQu0),
-      sQTxt ("sQTxt",  oAdd,    sQTxt,  sQuote, sQTxt,  sQTxt,  sQTxt,  sErQu0),
-      sQuote("sQuote", oNone,   sEoC,   sQTxt,  sQTail, sErQu1, sEoCR,  sEoCF ),
-      sQTail("sQTail", oEoC,    sStart, sErQu1, sQTail, sErQu1, sEoR,   sEoF  ),
+      sQHead("sQHead", oNew,    sErQu0, sQTxt,  sQTxt,  sQuote, sQTxt,  sQTxt ),
+      sQTxt ("sQTxt",  oAdd,    sErQu0, sQTxt,  sQTxt,  sQuote, sQTxt,  sQTxt ),
+      sQuote("sQuote", oNone,   sEoCF,  sEoCR,  sEoC,   sQTxt,  sQTail, sErQu1),
+      sQTail("sQTail", oEoC,    sEoF,   sEoR,   sStart, sErQu1, sQTail, sErQu1),
 
       sEoF  ("sEoF",   oEoF,    sErEof, sErEof, sErEof, sErEof, sErEof, sErEof),
       sEoCF ("sEoCF",  oEoCF,   sErEof, sErEof, sErEof, sErEof, sErEof, sErEof),

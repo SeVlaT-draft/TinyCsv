@@ -16,25 +16,29 @@ using std::string;
 using std::ifstream;
 using std::ofstream;
 
-using TinyCsv::TCsvCharTraitsA;
-using TinyCsv::TOutputParamsA;
+using TinyCsv::TCsvCharTraits;
+using TinyCsv::TOutputParams;
+using TinyCsv::TOutputParams;
 
+template<typename CH>
 struct TSrcOptions {
   string sFile;
 
-  TCsvCharTraitsA  cct;
+  TCsvCharTraits<CH> cct;
 };
 
+template<typename CH>
 struct TTrgOptions {
   string sFile;
 
-  TCsvCharTraitsA  cct;
-  TOutputParamsA paramsTrg;
+  TCsvCharTraits<CH> cct;
+  TOutputParams<CH> paramsTrg;
 };
 
+template<typename CH>
 struct TOptions {
-  TSrcOptions Src;
-  TTrgOptions Trg;
+  TSrcOptions<CH> Src;
+  TTrgOptions<CH> Trg;
 };
 
 

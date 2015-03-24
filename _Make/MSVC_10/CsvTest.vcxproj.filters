@@ -64,5 +64,11 @@
     <ClInclude Include="..\..\Tests\FsmChecker.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source.h">
+      <Filter>Header Files\TinyCsv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Action.h">
+      <Filter>Header Files\TinyCsv</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
