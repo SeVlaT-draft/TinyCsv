@@ -13,13 +13,37 @@ bool NeedEscape(      CH                ch,
                 const BASE_CHAR_TRAITS &bct,
                 const CSV_CHAR_TRAITS  &cct)
 {
-  if (bct.IsSep(ch)) return true;
-  if (bct.IsQte(ch)) return true;
-  if (cct.IsEol(ch)) return true;
+  if (cct.IsSep(ch)) return true;
+  if (cct.IsQte(ch)) return true;
+  if (bct.IsEol(ch)) return true;
 
   return false;
 }
 
+
+template <typename II,
+          typename CH,
+          typename BASE_CHAR_TRAITS,
+          typename CSV_CHAR_TRAITS>
+bool DoNeedEscape(      II                ii,
+                        II                iiE,
+                        CH                ch,
+                  const BASE_CHAR_TRAITS &bct,
+                  const CSV_CHAR_TRAITS  &cct,
+                        bool              bEscapeEdgeWhitespace)
+{
+  if (ii==iiE) return false;
+
+  if (bEscapeEdgeWhitespace && bct.IsWsp(ch)) return true;
+
+  for ( ; ii!=iiE; ++ii) {
+    ch=*ii;
+    if (NeedEscape(ch, bct, cct)) return true;
+  }
+
+  if (bEscapeEdgeWhitespace && bct.IsWsp(ch)) return true;
+  return false;
+}
 
 template <typename II,
           typename BASE_CHAR_TRAITS,
@@ -31,21 +55,25 @@ bool NeedEscape(      II                iiB,
                       bool              bEscapeEdgeWhitespace)
 {
   if (iiB==iiE) return false;
-
-  II ii=iiB;
-  CH chCur=*ii;
-
-  if (bEscapeEdgeWhitespace && bct.IsWsp(chCur)) return true;
-
-  for ( ; ii!=iiE; ++ii) {
-    chCur=*ii;
-    if (NeedEscape(chCur, bct, cct)) return true;
-  }
-
-  if (bEscapeEdgeWhitespace && bct.IsWsp(chCur)) return true;
-  return false;
+  return DoNeedEscape(iiB, iiE, *iiB, bct, cct, bEscapeEdgeWhitespace);
 }
 
+template <typename CH,
+          typename IO,
+          typename CSV_CHAR_TRAITS>
+IO CopyEscaped(      CH               ch,
+                     IO               io,
+               const CSV_CHAR_TRAITS &cct)
+{
+  if (cct.IsQte(ch)) {
+    *io=cct.chQte;
+    ++io;
+  }
+
+  *io=ch;
+  ++io;
+  return io;
+}
 
 template <typename II,
           typename IO,
@@ -59,15 +87,11 @@ IO CopyEscaped(      II               iiB,
   ++io;
 
   for (II i=iiB; i!=iiE; ++i) {
-    const CH ch=*i;
-    if (cct.IsQte(ch)) {
-      *io=cct.chQte;
-      ++io;
-    }
-
-    *io=ch;
-    ++io;
+    io=CopyEscaped(*i, io, cct);
   }
+
+  *io=cct.chQte;
+  ++io;
 
   return io;
 }
@@ -87,7 +111,7 @@ IO CopyUnescaped(II iiB, II iiE, IO io)
 struct CopierNoEscape {
  public:
   template <typename II, typename IO>
-  IO operator()(II iiB, II iiE, IO io)
+  IO operator()(II iiB, II iiE, IO io) const
   { return CopyUnescaped(iiB, iiE, io); }
 };
 
@@ -99,7 +123,7 @@ struct CopierAlwaysEscape {
 
  public:
   template <typename II, typename IO>
-  IO operator()(II iiB, II iiE, IO io)
+  IO operator()(II iiB, II iiE, IO io) const
   {
     return m_cct.CopyEscaped(iiB, iiE, io);
   }
@@ -120,9 +144,9 @@ struct CopierIfNeedEscape {
 
  public:
   template <typename II, typename IO>
-  IO operator()(II iiB, II iiE, IO io)
+  IO operator()(II iiB, II iiE, IO io) const
   {
-    if (NeedEscape(iiB, iiE, m_bct, m_cct))
+    if (NeedEscape(iiB, iiE, m_bct, m_cct, false))
       return CopyEscaped(iiB, iiE, io, m_cct);
 
     return CopyUnescaped(iiB, iiE, io); 
