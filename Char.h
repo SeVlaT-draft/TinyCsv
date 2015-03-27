@@ -19,12 +19,15 @@ enum TCharTag {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-template<typename CH>
+template<typename CH, CH ChPad=' ', CH ChEoL='\n'>
 struct TBaseCharTraits {
   typedef CH TChar;
 
-  static bool IsWsp(int ch) { return ch==0x09 || ch==0x20; }
-  static bool IsEol(int ch) { return ch==0x0D || ch==0x0A; }
+  static const CH chPad=ChPad;
+  static const CH chEoL=ChEoL;
+
+  static bool IsWsp(int ch) { return ch==0x09 || ch==0x20 || ch==ChPad; }
+  static bool IsEol(int ch) { return ch==0x0D || ch==0x0A || ch==ChEoL; }
 
   static bool IsEoF(int ch) { return ch==std::char_traits<CH>::eof(); }
 

@@ -129,7 +129,7 @@ struct CopierAlwaysEscape {
   }
 
  private:
-  const CSV_CHAR_TRAITS &m_cct;
+  CSV_CHAR_TRAITS m_cct;
 };
 
 
@@ -137,6 +137,14 @@ template <typename BASE_CHAR_TRAITS,
           typename CSV_CHAR_TRAITS>
 struct CopierIfNeedEscape {
  public:
+  CopierIfNeedEscape() {}
+
+  explicit CopierIfNeedEscape(const CSV_CHAR_TRAITS  &cct)
+   : m_cct(cct) {}
+
+  explicit CopierIfNeedEscape(const BASE_CHAR_TRAITS &bct)
+   : m_bct(bct) {}
+
   CopierIfNeedEscape(const BASE_CHAR_TRAITS &bct,
                      const CSV_CHAR_TRAITS  &cct)
    : m_bct(bct),
@@ -153,8 +161,8 @@ struct CopierIfNeedEscape {
   }
 
  private:
-  const BASE_CHAR_TRAITS &m_bct;
-  const CSV_CHAR_TRAITS  &m_cct;
+  BASE_CHAR_TRAITS m_bct;
+  CSV_CHAR_TRAITS  m_cct;
 };
 
 }

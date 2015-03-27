@@ -71,6 +71,63 @@ ITO AlignCenterRight(      ITI     iiB,
 }
 
 
+////////////////////////////////////////////////////////////////////////////////
+template <typename OITERATOR,
+          typename BASE_CHAR_TRAITS=TBaseCharTraitsA,
+          typename CSV_CHAR_TRAITS=TCsvCharTraitsA,
+          typename COPIER=CopierIfNeedEscape<BASE_CHAR_TRAITS,
+                                             CSV_CHAR_TRAITS> >
+class TOutput {
+ public:
+  TOutput(      OITERATOR        &oit,
+          const BASE_CHAR_TRAITS &bct=BASE_CHAR_TRAITS(),
+          const CSV_CHAR_TRAITS  &cct=CSV_CHAR_TRAITS(),
+          const COPIER           &Copier=COPIER())
+   : m_oit(oit),
+     m_bct(bct),
+     m_cct(cct),
+     m_Copier(Copier),
+     m_nCell(0),
+     m_nRow(0)  {}
+
+ public:
+  template <typename ITI>
+  void Cell(ITI iiB, ITI iiE) { BoC(); m_Copier(iiB, iiE, m_oit); ++m_nCell; }
+
+  void Cell() { BoC(); ++m_nCell; }
+
+  void Cell(char ch) { BoC(); m_oit++=ch; ++m_nCell; }
+
+  template <typename STRING>
+  void Cell(const STRING &s) { Cell(s.begin(), s.end()); }
+
+ public:
+  void EndOfLine()
+  {
+    m_nCell=0;
+    ++m_nRow;
+    m_oit++=m_bct.chEoL;
+  }
+
+ private:
+  void BoC()
+  { if (m_nCell>0) m_oit++=m_cct.chSep; }
+
+ private:
+  OITERATOR &m_oit;
+
+ private:
+  COPIER m_Copier;
+
+ private:
+  const BASE_CHAR_TRAITS m_bct;
+  const CSV_CHAR_TRAITS  m_cct;
+
+ private:
+  int m_nCell;
+  int m_nRow;
+
+};
 // SQE - Sep, Quote, Eol
 // LTS - leading or trailing space
 //                                                 FF   FT   TF   TT
