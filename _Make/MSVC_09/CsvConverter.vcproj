@@ -177,7 +177,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\Converter\Options.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\Converter\Types.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Converter\Utils.h"
 				>
 			</File>
 			<Filter

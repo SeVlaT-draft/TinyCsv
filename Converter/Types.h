@@ -9,37 +9,12 @@
 
 #include <cassert>
 
-#include "../Input.h"
-#include "../Output.h"
 
+using std::basic_string;
 using std::string;
+using std::wstring;
+
 using std::ifstream;
 using std::ofstream;
-
-using TinyCsv::TCsvCharTraits;
-using TinyCsv::TOutputParams;
-using TinyCsv::TOutputParams;
-
-template<typename CH>
-struct TSrcOptions {
-  string sFile;
-
-  TCsvCharTraits<CH> cct;
-};
-
-template<typename CH>
-struct TTrgOptions {
-  string sFile;
-
-  TCsvCharTraits<CH> cct;
-  TOutputParams<CH> paramsTrg;
-};
-
-template<typename CH>
-struct TOptions {
-  TSrcOptions<CH> Src;
-  TTrgOptions<CH> Trg;
-};
-
 
 #endif

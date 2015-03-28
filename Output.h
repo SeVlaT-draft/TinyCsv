@@ -12,6 +12,8 @@ template<typename CH>
 struct TOutputParams {
   CH chPad;   // 0 if no padding
 
+  bool bPadQuote;
+
   bool bPadLeft;
   bool bPadRight;
 
