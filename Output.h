@@ -74,7 +74,8 @@ ITO AlignCenterRight(      ITI     iiB,
 
 
 ////////////////////////////////////////////////////////////////////////////////
-template <typename OITERATOR,
+template <typename CH,
+          typename OITERATOR,
           typename BASE_CHAR_TRAITS=TBaseCharTraitsA,
           typename CSV_CHAR_TRAITS=TCsvCharTraitsA,
           typename COPIER=CopierIfNeedEscape<BASE_CHAR_TRAITS,
@@ -98,7 +99,11 @@ class TOutput {
 
   void Cell() { BoC(); ++m_nCell; }
 
-  void Cell(char ch) { BoC(); m_oit++=ch; ++m_nCell; }
+  void Cell(CH ch) { BoC(); m_oit++=ch; ++m_nCell; }
+
+ public:
+  template<int N>
+  void Cell(const CH (&str)[N]) { Cell(str+0, str+N); }
 
   template <typename STRING>
   void Cell(const STRING &s) { Cell(s.begin(), s.end()); }
