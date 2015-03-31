@@ -117,6 +117,68 @@ class TInput {
   TCounter m_cntRec;
 };
 
+////////////////////////////////////////////////////////////////////////////////
+template <typename CELL>
+class TCsvIterator {
+ public:
+  template <typename SOURCE, typename VISITOR>
+  bool Cell(SOURCE &Source, VISITOR &Visitor)
+  {
+    while (m_Input.Iteration(Source, m_Cell));
+
+    if (m_Input.IsEoC())
+      Visitor.Cell(m_Cell.Begin(), m_Cell.End(), m_Input.GetCellNumber());
+
+    return m_Input.NextCell();
+  }
+
+  template <typename SOURCE, typename VISITOR>
+  bool Row(SOURCE &Source, VISITOR &Visitor)
+  {
+    Visitor.RowBegin(m_Input.GetRowNumber());
+    while (Cell(Source, Visitor)) ;
+    Visitor.RowEnd();
+    return m_Input.NextRow();
+  }
+
+  template <typename SOURCE, typename VISITOR>
+  void operator()(SOURCE &Source, VISITOR &Visitor)
+  {
+    while (Row(Source, Visitor)) ;
+  }
+
+  template <typename VISITOR>
+  bool operator()(int       ch,
+                  TCharTag  ct,
+                  VISITOR  &Visitor)
+  {
+    if (m_Input.Iteration(ch, ct, m_Cell)) return true;
+
+    const int nRow=m_Input.GetRowNumber();
+    const int nCell=m_Input.GetCellNumber();
+
+    if (nCell==0) Visitor.RowBegin(nRow);
+
+    if (m_Input.IsEoC())
+      Visitor.Cell(m_Cell.Begin(), m_Cell.End(), nCell);
+
+    if (m_Input.NextCell()) return true;
+
+    Visitor.RowEnd();
+
+    return m_Input.NextRow();
+  }
+
+
+ private:
+  typedef TFsm<TFsmDescr> TFsm1;
+  TInput<TFsm1> m_Input;
+
+ private:
+  CELL m_Cell;
+};
+
+
 } // namespace TinyCsv
 
 #endif
