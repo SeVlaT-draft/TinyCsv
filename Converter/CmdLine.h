@@ -4,7 +4,7 @@
 // SeVlaT, 12.03.2015
 //
 
-#include "Types.h"
+#include "Options.h"
 
 // /I  <string> Input file
 // /IS <char>   Input separator
@@ -35,13 +35,5 @@ class TCmdLine {
   bool Parse(const CH *szCmdLine,
              TOptions<CH> &Options);
 };
-
-bool ParseCmdLine(int       argc,
-                  const CH* const *argv,
-                  TOptions<CH> &Options);
-
-template <typename CH>
-bool ParseCmdLine(const CH *szCmdLine,
-                  TOptions<CH> &Options);
 
 #endif

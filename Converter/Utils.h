@@ -13,7 +13,7 @@ bool String2Int(const string &s, int &n)
 
 bool String2Int(const wstring &s, int &n)
 {
-  return swscanf(s.c_str(), _L"%d", &n)==1;
+  return swscanf(s.c_str(), L"%d", &n)==1;
 }
 
 template <typename CH>
