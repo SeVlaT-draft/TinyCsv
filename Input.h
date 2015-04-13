@@ -135,16 +135,23 @@ class TCsvIterator {
   template <typename SOURCE, typename VISITOR>
   bool Row(SOURCE &Source, VISITOR &Visitor)
   {
-    Visitor.RowBegin(m_Input.GetRowNumber());
     while (Cell(Source, Visitor)) ;
-    Visitor.RowEnd();
     return m_Input.NextRow();
+  }
+
+  template <typename SOURCE, typename VISITOR>
+  bool FullRow(SOURCE &Source, VISITOR &Visitor)
+  {
+    Visitor.RowBegin(m_Input.GetRowNumber());
+    const bool bRes=Row(Source, Visitor);
+    Visitor.RowEnd();
+    return bRes;
   }
 
   template <typename SOURCE, typename VISITOR>
   void operator()(SOURCE &Source, VISITOR &Visitor)
   {
-    while (Row(Source, Visitor)) ;
+    while (FullRow(Source, Visitor)) ;
   }
 
   template <typename VISITOR>
