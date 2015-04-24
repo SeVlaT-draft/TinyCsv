@@ -76,6 +76,7 @@ class TInput {
   }
 
  public:
+  bool IsEoF() const   { return m_Fsm.Action().bEoF; }
   bool IsEoC() const   { return m_cntFld.IsStopped(); }
   bool IsEoR() const   { return m_cntRec.IsStopped(); }
 
@@ -135,18 +136,37 @@ class TCsvIterator {
   template <typename SOURCE, typename VISITOR>
   bool Row(SOURCE &Source, VISITOR &Visitor)
   {
-    Visitor.RowBegin(m_Input.GetRowNumber());
     while (Cell(Source, Visitor)) ;
-    Visitor.RowEnd();
     return m_Input.NextRow();
+  }
+
+  template <typename SOURCE, typename VISITOR>
+  bool ReadRow(SOURCE &Source, VISITOR &Visitor) // return false if failed to read row
+  {
+    if (m_Input.IsEoF()) return false;
+
+    while (Cell(Source, Visitor)) ;
+    m_Input.NextRow();
+    return true;
+  }
+
+ public:
+  template <typename SOURCE, typename VISITOR>
+  bool FullRow(SOURCE &Source, VISITOR &Visitor)
+  {
+    Visitor.RowBegin(m_Input.GetRowNumber());
+    const bool bRes=Row(Source, Visitor);
+    Visitor.RowEnd();
+    return bRes;
   }
 
   template <typename SOURCE, typename VISITOR>
   void operator()(SOURCE &Source, VISITOR &Visitor)
   {
-    while (Row(Source, Visitor)) ;
+    while (FullRow(Source, Visitor)) ;
   }
 
+ public:
   template <typename VISITOR>
   bool operator()(int       ch,
                   TCharTag  ct,
