@@ -57,6 +57,14 @@ void Test1()
   TestArr(I, O);
 }
 
+void Test1a()
+{
+  TCharTag     I[]={cSmb,  cSmb, cEoL,  cEoF };
+  TActionFlags O[]={oNAdd, oAdd, oEoCR, oEoF};
+
+  TestArr(I, O);
+}
+
 void Test2()
 {
   TCharTag     I[]={cWsp,  cQte, cSmb, cSmb, cQte,  cEoF };
@@ -93,6 +101,7 @@ void TestA()
 {
   Test0();
   Test1();
+  Test1a();
   Test2();
   Test3();
   Test4();
