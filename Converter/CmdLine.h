@@ -25,15 +25,15 @@
 template <typename CH>
 class TCmdLine {
  public:
-  typedef const char* TPStr;
+  typedef const CH* TPChar;
 
  public:
-  bool Parse(      int    argc,
-             const TPStr *argv,
+  bool Parse(      int           argc,
+             const TPChar       *argv,
                    TOptions<CH> &Options);
 
-  bool Parse(const CH *szCmdLine,
-             TOptions<CH> &Options);
+  bool Parse(const CH           *szCmdLine,
+                   TOptions<CH> &Options);
 };
 
 #endif

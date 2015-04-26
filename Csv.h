@@ -4,13 +4,13 @@
 // SeVlaT, 18.02.2015
 //
 
-#include <TinyCsv/Output.h>
-#include <TinyCsv/Escape.h>
-#include <TinyCsv/Char.h>
-#include <TinyCsv/Cell.h>
-#include <TinyCsv/Input.h>
-#include <TinyCsv/Source.h>
-#include <TinyCsv/Output.h>
+#include "Output.h"
+#include "Escape.h"
+#include "Char.h"
+#include "Cell.h"
+#include "Input.h"
+#include "Source.h"
+#include "Output.h"
 
 namespace TinyCsv {
 

@@ -13,11 +13,11 @@ namespace TinyCsv {
 // std::string, std::wstring, QString
 
 template <typename STRING, bool TRIMSPACES>
-class  TCellStr;
+class TCellStr;
 
 ////////////////////////////////////////////////////////////////////////////////
 template <typename STRING>
-class  TCellStr<STRING, false> {
+class TCellStr<STRING, false> {
  public:
   typedef typename STRING::value_type     TChar;
   typedef typename STRING::const_iterator TCIt;
@@ -39,7 +39,7 @@ class  TCellStr<STRING, false> {
 
 ////////////////////////////////////////////////////////////////////////////////
 template <typename STRING>
-class  TCellStr<STRING, true> {
+class TCellStr<STRING, true> {
  public:
   typedef typename STRING::value_type     TChar;
   typedef typename STRING::const_iterator TCIt;

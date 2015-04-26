@@ -22,21 +22,24 @@ class TCmdOptionParser {
   bool operator()(const TString &s)
   {
     if (!CheckKeyCount(s)) return false;
-    DoParse();
+    DoParse(m_Val);
     return true;
   }
 
  private:
   bool CheckKeyCount(const TString &s)
   {
-    if (!StringIsEqual(s, m_sKey)) return false;
+    if (!StringsAreEqual(m_sKey, s)) return false;
     if (m_nCount==0) throw std::exception("Count is zero");
     --m_nCount;
     return true;
   }
 
  private:
-  void DoParse();
+  void DoParse(bool &bVal);
+  void DoParse(int &nVal);
+  void DoParse(TString &sVal);
+  void DoParse(TChar &chVal);
 
   void ThrowError(const char *sz) const
   {
@@ -53,38 +56,38 @@ class TCmdOptionParser {
   int m_nCount;
 };
 
-template<typename SOURCE>
-void TCmdOptionParser<SOURCE, bool>::DoParse()
+template<typename SOURCE, typename VALUE>
+void TCmdOptionParser<SOURCE, VALUE>::DoParse(bool &bVal)
 {
-  m_Val=true;
+  bVal=true;
 }
 
-template<typename SOURCE>
-void TCmdOptionParser<SOURCE, int>::DoParse()
+template<typename SOURCE, typename VALUE>
+void TCmdOptionParser<SOURCE, VALUE>::DoParse(int &nVal)
 {
   TString s;
   if (!m_Src.Get(s)) return;
 
   int n=0;
   if (!String2Int(s, n)) return;
-  m_Val=n;
+  nVal=n;
 }
 
-template<typename SOURCE>
-void TCmdOptionParser<SOURCE, TString>::DoParse()
+template<typename SOURCE, typename VALUE>
+void TCmdOptionParser<SOURCE, VALUE>::DoParse(TString &sVal)
 {
   TString s;
   if (!m_Src.Get(s)) return;
-  m_Val=s;
+  sVal=s;
 }
 
-template<typename SOURCE>
-void TCmdOptionParser<SOURCE, TChar>::DoParse()
+template<typename SOURCE, typename VALUE>
+void TCmdOptionParser<SOURCE, VALUE>::DoParse(TChar &chVal)
 {
   TString s;
   if (!m_Src.Get(s)) return;
   if (s.length()!=1) return;
-  m_Val=s;
+  chVal=s[0];
 }
 
 template<typename SOURCE>
@@ -100,10 +103,10 @@ class TCmdLineParser {
 
  private:
  public:
-  TCmdLineParser()
+  TCmdLineParser();
 
  public:
-  bool Parse(SOURCE &src, TOptions &opt)
+  bool Parse(SOURCE &src, TOptions<TChar> &opt)
   {
     TOpString osI (src, "/I",  opt.Src.sFile                          );
     TOpChar   osIS(src, "/IS", opt.Src.cct.chSep                      );
@@ -140,9 +143,46 @@ struct TDummiSrc {
   bool Get(wstring &s) { return true; }
 };
 
+template <typename CH>
+class TCmdLineSrc {
+ public:
+  typedef CH TChar;
+  typedef basic_string<CH> TString;
+
+ public:
+  TCmdLineSrc()
+   : m_cct(' ', '\'') {}
+
+ public:
+  bool Get(TString &s)
+  {
+    TCsvIterator<TCellStr<std::string, true> > It;
+    It.Cell();
+    return true;
+  }
+
+ private:
+  std::basic_istream<CH> &m_stream;
+  TBaseCharTraits<CH> m_bct;
+  TCsvCharTraits<CH> m_cct;
+/*
+
+
+  TCharTag ct=cEoF;
+  do {
+    const int ch=is.get();
+    ct=CharTagEof(ch, bct, cct);
+
+    if (!It(ch, ct, Tester)) return;
+  } while (ct!=cEoF);
+
+*/
+  
+};
+
 bool ParseCmdLine(int       argc,
                   const char* const argv[],
-                  TOptions &Options)
+                  TOptions<char> &Options)
 {
   TDummiSrc src;
   TCmdLineParser<TDummiSrc> parser;
@@ -150,9 +190,12 @@ bool ParseCmdLine(int       argc,
   return false;
 }
 
-bool ParseCmdLine(const char *szCmdLine,
-                  TOptions &Options)
+template <typename CH>
+bool TCmdLine<CH>::Parse(const CH           *szCmdLine,
+                               TOptions<CH> &Options)
 {
+  std::basic_istringstream<CH> ss(szCmdLine);
+
   return false;
 }
 

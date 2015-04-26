@@ -17,7 +17,7 @@ bool String2Int(const wstring &s, int &n)
 }
 
 template <typename CH>
-bool StringIsEqual(const basic_string<CH> &s, const char *sz)
+bool StringsAreEqual(const char *sz, const basic_string<CH> &s)
 {
   if (!sz) return false;
 
@@ -26,6 +26,14 @@ bool StringIsEqual(const basic_string<CH> &s, const char *sz)
     if (*I!=*sz) return false;
   }
   return true;
+}
+
+template <typename CH>
+bool StringsAreEqual(const string &s0, const basic_string<CH> &s1)
+{
+  if (s0.length()!=s1.length()) return false;
+
+  return std::equal(s0.begin(), s0.end(), s1.begin());
 }
 
 #endif
