@@ -1,5 +1,7 @@
 // SeVlaT, 12.03.2015
 //
+#include <sstream>"
+
 #include "CmdLine.h"
 
 #include "Utils.h"
@@ -12,7 +14,7 @@ class TCmdOptionParser {
   typedef basic_string<TChar>    TString;
 
  public:
-  TCmdOptionParser(SOURCE &Src, const TString &sKey, VALUE &Val)
+  TCmdOptionParser(SOURCE &Src, const string &sKey, VALUE &Val)
    : m_Src(Src),
      m_Val(Val),
      m_sKey(sKey),
@@ -150,21 +152,22 @@ class TCmdLineSrc {
   typedef basic_string<CH> TString;
 
  public:
-  TCmdLineSrc()
-   : m_cct(' ', '\'') {}
+  TCmdLineSrc(std::basic_istream<CH> &stream)
+   : m_stream(stream),
+     m_cct(' ', '\"') {}
 
  public:
   bool Get(TString &s)
   {
-    TCsvIterator<TCellStr<std::string, true> > It;
+    TinyCsv::TCsvIterator<TinyCsv::TCellStr<std::string, true> > It;
     It.Cell();
     return true;
   }
 
  private:
   std::basic_istream<CH> &m_stream;
-  TBaseCharTraits<CH> m_bct;
-  TCsvCharTraits<CH> m_cct;
+  TinyCsv::TBaseCharTraits<CH> m_bct;
+  TinyCsv::TCsvCharTraits<CH> m_cct;
 /*
 
 
@@ -196,6 +199,12 @@ bool TCmdLine<CH>::Parse(const CH           *szCmdLine,
 {
   std::basic_istringstream<CH> ss(szCmdLine);
 
+  TCmdLineSrc<CH> src(ss); 
+  TCmdLineParser<TCmdLineSrc<CH> > parser;
+  parser.Parse(src, Options);
+
   return false;
 }
 
+template TCmdLine<char>;
+template TCmdLine<wchar_t>;

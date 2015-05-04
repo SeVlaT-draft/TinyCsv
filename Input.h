@@ -76,12 +76,12 @@ class TInput {
   }
 
  public:
-  bool IsEoF() const   { return m_Fsm.Action().bEoF; }
-  bool IsEoC() const   { return m_cntFld.IsStopped(); }
-  bool IsEoR() const   { return m_cntRec.IsStopped(); }
+  bool IsEoF() const { return m_Fsm.Action().bEoF; }
+  bool IsEoC() const { return m_cntFld.IsStopped(); }
+  bool IsEoR() const { return m_cntRec.IsStopped(); }
 
-  int GetRowNumber() const { return m_cntRec.Cur(); }
-  int GetCellNumber()  const { return m_cntFld.Cur(); }
+  int GetRowNumber()  const { return m_cntRec.Cur(); }
+  int GetCellNumber() const { return m_cntFld.Cur(); }
 
  public:
   template <typename SOURCE, typename CELL>
@@ -119,8 +119,28 @@ class TInput {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
+//    <Cell>     <Cell>     <Cell>          <Cell>     <Cell>          
+//          <EoC>      <EoC>      <EoC>           <EoC>      <EoC>     
+//                                     <EoR>                      <EoR>
+//       --|----------|----------|     ----------|----------|
+//       -------|----------|----------|     ----------|----------|
+//          -------------------------------|--------------------------|
 template <typename CELL>
 class TCsvIterator {
+ public:
+  template <typename SOURCE>
+  bool Cell(SOURCE &Source)
+  {
+    if (m_Input.IsEoR()) return false;
+    if (m_Input.IsEoF()) return false;
+
+    while (m_Input.Iteration(Source, m_Cell));
+
+    m_Input.NextCell();
+
+    return true;
+  }
+
  public:
   template <typename SOURCE, typename VISITOR>
   bool Cell(SOURCE &Source, VISITOR &Visitor)
