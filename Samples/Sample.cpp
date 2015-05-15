@@ -16,14 +16,13 @@ void Sample(std::istream &is)
 {
   typedef TFsm<TFsmDescr> TFsm1;
 
-  typedef TStreamSource<std::istream> TSource;
-  typedef  TCellStr<std::string, false>  TField1;
+  typedef TStreamSource<std::istream>   TSource;
+  typedef  TCellStr<std::string, false> TCell;
 
   TSource Source(is);
-  TField1 Field;
-  TInput<TFsm1, TSource, TField1> Input(Source, Field);
+  TInput<TFsm1, TCell> Input;
 
-  Input.ReadField();
+  Input.ReadCell(Source);
   Input.NextRow();
 }
 

@@ -43,56 +43,72 @@ void TestArr(const TCharTag     (&In) [N],
 
 void Test0()
 {
-  TCharTag     I[]={cSmb,  cSmb, cSep, cEoF };
-  TActionFlags O[]={oNAdd, oAdd, oEoC, oEoF };
+  TCharTag     I[]={cSmb,  cSmb, cEoF };
+  TActionFlags O[]={oNAdd, oAdd, oEcf};
 
   TestArr(I, O);
 }
 
 void Test1()
 {
-  TCharTag     I[]={cSmb,  cSmb, cEoF };
-  TActionFlags O[]={oNAdd, oAdd, oEoCF};
-
-  TestArr(I, O);
-}
-
-void Test1a()
-{
-  TCharTag     I[]={cSmb,  cSmb, cEoL,  cEoF };
-  TActionFlags O[]={oNAdd, oAdd, oEoCR, oEoF};
+  TCharTag     I[]={cSmb,  cSmb, cEoL, cEoF};
+  TActionFlags O[]={oNAdd, oAdd, oEcr, oEf};
 
   TestArr(I, O);
 }
 
 void Test2()
 {
-  TCharTag     I[]={cWsp,  cQte, cSmb, cSmb, cQte,  cEoF };
-  TActionFlags O[]={oNALW, oNew, oAdd, oAdd, oNone, oEoCF};
+  TCharTag     I[]={cSmb,  cSmb, cSep, cEoF };
+  TActionFlags O[]={oNAdd, oAdd, oEc,  oNEcf};
 
   TestArr(I, O);
 }
 
 void Test3()
 {
-  TCharTag     I[]={cWsp,  cQte, cSmb, cQte,  cQte, cSmb, cQte,  cEoF };
-  TActionFlags O[]={oNALW, oNew, oAdd, oNone, oAdd, oAdd, oNone, oEoCF};
+  TCharTag     I[]={cSmb,  cSmb, cSep, cEoF};
+  TActionFlags O[]={oNAdd, oAdd, oEc,  oNEcf};
 
   TestArr(I, O);
 }
 
 void Test4()
 {
-  TCharTag     I[]={cQte, cSmb, cQte,  cEoL,  cEoF};
-  TActionFlags O[]={oNew, oAdd, oNone, oEoCR, oEoF};
+  TCharTag     I[]={cSmb,  cSmb, cSep, cEoL, cEoF};
+  TActionFlags O[]={oNAdd, oAdd, oEc,  oNEr, oEf};
 
   TestArr(I, O);
 }
 
 void Test5()
 {
+  TCharTag     I[]={cWsp,  cQte, cSmb, cSmb, cQte,  cEoF };
+  TActionFlags O[]={oNALW, oNew, oAdd, oAdd, oNone, oEcf};
+
+  TestArr(I, O);
+}
+
+void Test6()
+{
+  TCharTag     I[]={cWsp,  cQte, cSmb, cQte,  cQte, cSmb, cQte,  cEoF };
+  TActionFlags O[]={oNALW, oNew, oAdd, oNone, oAdd, oAdd, oNone, oEcf};
+
+  TestArr(I, O);
+}
+
+void Test7()
+{
+  TCharTag     I[]={cQte, cSmb, cQte,  cEoL, cEoF};
+  TActionFlags O[]={oNew, oAdd, oNone, oEcr, oEf};
+
+  TestArr(I, O);
+}
+
+void Test8()
+{
   TCharTag     I[]={cQte, cSmb, cQte,  cWsp, cEoL, cEoF};
-  TActionFlags O[]={oNew, oAdd, oNone, oEoC, oEoR, oEoF};
+  TActionFlags O[]={oNew, oAdd, oNone, oEc,  oEr,  oEf};
 
   TestArr(I, O);
 }
@@ -101,9 +117,11 @@ void TestA()
 {
   Test0();
   Test1();
-  Test1a();
   Test2();
   Test3();
   Test4();
   Test5();
+  Test6();
+  Test7();
+  Test8();
 }

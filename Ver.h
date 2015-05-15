@@ -5,13 +5,13 @@
 //
 
 #define TINYCSV_VERSION_MAJOR 0
-#define TINYCSV_VERSION_MINOR 5
+#define TINYCSV_VERSION_MINOR 6
 
 namespace TinyCsv {
 
 enum {
   c_nVersionMajor=TINYCSV_VERSION_MAJOR,
-  c_nVersionMimor=TINYCSV_VERSION_MINOR
+  c_nVersionMinor=TINYCSV_VERSION_MINOR
 };
 
 }

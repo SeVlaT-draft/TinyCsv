@@ -27,6 +27,9 @@ class TCellStr<STRING, false> {
   TCIt End()   const { return m_s.end();   }
 
  public:
+  const STRING& Str() const { return m_s; }
+
+ public:
   void Next(TChar ch, const TBufAction &BA)
   {
     if (BA.bNew) m_s=STRING();

@@ -53,42 +53,45 @@ class TFsmDescr {
 
  private:
   const TState sHead; // A dummy state, just to be a header for transition table
-  const TState sStart, sEoC, sEoR, sEoCR, sNEoC, sNEoR;
-  const TState sWsp0, sWsp, sTxt0, sTxt, sTWsp;
-  const TState sQHead, sQTxt, sQuote, sQTail;
-  const TState sEoF, sEoCF;
-  const TState sErTxt, sErEof, sErQu0, sErQu1;
+
+  const TState sStart;                          // Start state
+  const TState sEc, sEr, sEcr, sNEc, sNEr;      // End-of-Cell, End-of-Row states
+  const TState sWsp0, sWsp, sTxt0, sTxt, sTWsp; // States in ordinary cells
+  const TState sQHead, sQTxt, sQuote, sQTail;   // States in quoted cells
+  const TState sEf, sEcf, sNEcf;                // End-of-File states
+  const TState sFTxt, sFEof, sFQuo0, sFQuo1;    // Fault states
 
  public:
   TFsmDescr()
    :
-      sHead ("sHead",  oNone,   cEoF,   cEoL,   cSep,   cQte,   cWsp,   cSmb  ),
+     sHead ("",        oNone,   cEoF,   cEoL,   cSep,   cQte,   cWsp,   cSmb  ),
 
-      sStart("sStart", oNone,   sEoF,   sNEoR,  sNEoC,  sQHead, sWsp0,  sTxt0 ),
-      sEoC  ("sEoC",   oEoC,    sEoF,   sNEoR,  sNEoC,  sQHead, sWsp0,  sTxt0 ),
-      sNEoC ("sNEoC",  oNEoC,   sEoF,   sNEoR,  sNEoC,  sQHead, sWsp0,  sTxt0 ),
-      sEoR  ("sEoR",   oEoR,    sEoF,   sNEoR,  sNEoC,  sQHead, sWsp0,  sTxt0 ),
-      sNEoR ("sNEoR",  oNEoR,   sEoF,   sNEoR,  sNEoC,  sQHead, sWsp0,  sTxt0 ),
-      sEoCR ("sEoCR",  oEoCR,   sEoF,   sNEoR,  sNEoC,  sQHead, sWsp0,  sTxt0 ),
+     sStart("sStart",  oNone,   sEf,    sNEr,   sNEc,   sQHead, sWsp0,  sTxt0 ),
+     sEc   ("sEc",     oEc,     sNEcf,  sNEr,   sNEc,   sQHead, sWsp0,  sTxt0 ),
+     sNEc  ("sNEc",    oNEc,    sEf,    sNEr,   sNEc,   sQHead, sWsp0,  sTxt0 ),
+     sEr   ("sEr",     oEr,     sEf,    sNEr,   sNEc,   sQHead, sWsp0,  sTxt0 ),
+     sNEr  ("sNEr",    oNEr,    sEf,    sNEr,   sNEc,   sQHead, sWsp0,  sTxt0 ),
+     sEcr  ("sEcr",    oEcr,    sEf,    sNEr,   sNEc,   sQHead, sWsp0,  sTxt0 ),
 
-      sWsp0 ("sWsp0",  oNALW,   sEoCF,  sEoCR,  sEoC,   sQHead, sWsp,   sTxt  ),
-      sWsp  ("sWsp",   oALW,    sEoCF,  sEoCR,  sEoC,   sQHead, sWsp,   sTxt  ),
-      sTxt0 ("sTxt0",  oNAdd,   sEoCF,  sEoCR,  sEoC,   sErTxt, sTWsp,  sTxt  ),
-      sTxt  ("sTxt",   oAdd,    sEoCF,  sEoCR,  sEoC,   sErTxt, sTWsp,  sTxt  ),
-      sTWsp ("sTWsp",  oATW,    sEoCF,  sEoCR,  sEoC,   sErTxt, sTWsp,  sTxt  ),
+     sWsp0 ("sWsp0",   oNALW,   sEcf,   sEcr,   sEc,    sQHead, sWsp,   sTxt  ),
+     sWsp  ("sWsp",    oALW,    sEcf,   sEcr,   sEc,    sQHead, sWsp,   sTxt  ),
+     sTxt0 ("sTxt0",   oNAdd,   sEcf,   sEcr,   sEc,    sFTxt,  sTWsp,  sTxt  ),
+     sTxt  ("sTxt",    oAdd,    sEcf,   sEcr,   sEc,    sFTxt,  sTWsp,  sTxt  ),
+     sTWsp ("sTWsp",   oATW,    sEcf,   sEcr,   sEc,    sFTxt,  sTWsp,  sTxt  ),
 
-      sQHead("sQHead", oNew,    sErQu0, sQTxt,  sQTxt,  sQuote, sQTxt,  sQTxt ),
-      sQTxt ("sQTxt",  oAdd,    sErQu0, sQTxt,  sQTxt,  sQuote, sQTxt,  sQTxt ),
-      sQuote("sQuote", oNone,   sEoCF,  sEoCR,  sEoC,   sQTxt,  sQTail, sErQu1),
-      sQTail("sQTail", oEoC,    sEoF,   sEoR,   sStart, sErQu1, sQTail, sErQu1),
+     sQHead("sQHead",  oNew,    sFQuo0, sQTxt,  sQTxt,  sQuote, sQTxt,  sQTxt ),
+     sQTxt ("sQTxt",   oAdd,    sFQuo0, sQTxt,  sQTxt,  sQuote, sQTxt,  sQTxt ),
+     sQuote("sQuote",  oNone,   sEcf,   sEcr,   sEc,    sQTxt,  sQTail, sFQuo1),
+     sQTail("sQTail",  oEc,     sEf,    sEr,    sStart, sFQuo1, sQTail, sFQuo1),
 
-      sEoF  ("sEoF",   oEoF,    sErEof, sErEof, sErEof, sErEof, sErEof, sErEof),
-      sEoCF ("sEoCF",  oEoCF,   sErEof, sErEof, sErEof, sErEof, sErEof, sErEof),
+     sEf   ("sEf",     oEf,     sFEof,  sFEof,  sFEof,  sFEof,  sFEof,  sFEof ),
+     sEcf  ("sEcf",    oEcf,    sFEof,  sFEof,  sFEof,  sFEof,  sFEof,  sFEof ),
+     sNEcf ("sNEcf",   oNEcf,   sFEof,  sFEof,  sFEof,  sFEof,  sFEof,  sFEof ),
 
-      sErTxt("sErTxt", oErTx,   sErEof, sErEof, sErEof, sErEof, sErEof, sErEof),
-      sErQu0("sErQu0", oErQ0,   sErEof, sErEof, sErEof, sErEof, sErEof, sErEof),
-      sErQu1("sErQu1", oErQ1,   sErEof, sErEof, sErEof, sErEof, sErEof, sErEof),
-      sErEof("sErEof", oErSt,   sErEof, sErEof, sErEof, sErEof, sErEof, sErEof)
+     sFTxt ("sFTxt",   oFTxt,   sFEof,  sFEof,  sFEof,  sFEof,  sFEof,  sFEof ),
+     sFQuo0("sFQuo0",  oFQu0,   sFEof,  sFEof,  sFEof,  sFEof,  sFEof,  sFEof ),
+     sFQuo1("sFQuo1",  oFQu1,   sFEof,  sFEof,  sFEof,  sFEof,  sFEof,  sFEof ),
+     sFEof ("sFEof",   oFStp,   sFEof,  sFEof,  sFEof,  sFEof,  sFEof,  sFEof )
   {}
 
  public:

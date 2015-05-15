@@ -5,7 +5,6 @@
 //
 
 #include "Char.h"
-#include "Fsm.h"
 
 #include "Debug.h"
 
@@ -53,8 +52,36 @@ class TCounter {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-template <typename FSM>
+//  <Cell>       <Cell>       <Cell>             <Cell>                         
+//         <EoC>        <EoC>        <EoC>              <EoC> <EoC>             
+//                                         <EoR>                    <EoR> <EoR> 
+//         ----|        ----|        ----|              ----| ----|             
+//                                         ----|                    ----| ----| 
+//*    --|       -----|       -----|             -----|      |                  
+//*    --|------------|------------|------------------|------|------------------
+//*    --|------------|------------|------|      -----|------|-----|            
+//     --------|------------|------------|------------------|-----|-------      
+//     --------|------------|------------||      -----------|-----||     |      
+//*  -------------------------------------|------------------------|-----|---   
+//        -------------------------------------|------------------------|-----| 
+//                                         <EoR>                    <EoR> <EoR> 
+//         <EoC>        <EoC>        <EoC>              <EoC> <EoC>             
+//  <Cell>       <Cell>       <Cell>             <Cell>                         
+template <typename FSM, typename CELL>
 class TInput {
+ public:
+  const CELL& Cell() const { return m_Cell; }
+
+ public:
+  bool IsStop() const { return m_Fsm.Action().bStop; }
+
+  bool IsEoF() const { return m_Fsm.Action().bEoF; }
+  bool IsEoC() const { return m_cntFld.IsStopped(); }
+  bool IsEoR() const { return m_cntRec.IsStopped(); }
+
+  int GetRowNumber()  const { return m_cntRec.Cur(); }
+  int GetCellNumber() const { return m_cntFld.Cur(); }
+
  public:
   bool NextCell()
   {
@@ -76,31 +103,23 @@ class TInput {
   }
 
  public:
-  bool IsEoF() const { return m_Fsm.Action().bEoF; }
-  bool IsEoC() const { return m_cntFld.IsStopped(); }
-  bool IsEoR() const { return m_cntRec.IsStopped(); }
-
-  int GetRowNumber()  const { return m_cntRec.Cur(); }
-  int GetCellNumber() const { return m_cntFld.Cur(); }
-
- public:
-  template <typename SOURCE, typename CELL>
-  bool Iteration(SOURCE &Source, CELL &Cell)
+  template <typename SOURCE>
+  bool ProcessChar(SOURCE &Source)
   {
     typedef typename SOURCE::TChar TChar;
     TChar ch=0;
     const TCharTag ct=Source.GetChar(ch);
-    return Iteration(ch, ct, Cell);
+    return ProcessChar(ch, ct);
   }
 
-  template <typename CH, typename CELL>
-  bool Iteration(CH ch, TCharTag ct, CELL &Cell)
+  template <typename CH>
+  bool ProcessChar(CH ch, TCharTag ct)
   {
     m_Fsm.Next(ct);
 
     const TAction &Action=m_Fsm.Action();
 
-    Cell.Next(ch, Action.BufAction);
+    m_Cell.Next(ch, Action.BufAction);
 
     m_cntFld.Next(Action.bEoC);
     m_cntRec.Next(Action.bEoR);
@@ -110,80 +129,72 @@ class TInput {
            !Action.bStop;
   }
 
- private:
-  FSM m_Fsm;
-
- private:
-  TCounter m_cntFld;
-  TCounter m_cntRec;
-};
-
-////////////////////////////////////////////////////////////////////////////////
-//    <Cell>     <Cell>     <Cell>          <Cell>     <Cell>          
-//          <EoC>      <EoC>      <EoC>           <EoC>      <EoC>     
-//                                     <EoR>                      <EoR>
-//       --|----------|----------|     ----------|----------|
-//       -------|----------|----------|     ----------|----------|
-//          -------------------------------|--------------------------|
-template <typename CELL>
-class TCsvIterator {
  public:
   template <typename SOURCE>
-  bool Cell(SOURCE &Source)
+  bool ReadCell(SOURCE &Source)
   {
-    if (m_Input.IsEoR()) return false;
-    if (m_Input.IsEoF()) return false;
+    if (IsStop()) return false;
+    if (IsEoR()) return false;
 
-    while (m_Input.Iteration(Source, m_Cell));
+    if (IsEoC()) NextCell();
 
-    m_Input.NextCell();
+    while (ProcessChar(Source));
 
+    return IsEoC();
+  }
+
+  template <typename SOURCE>
+  bool ReadCellThroughRows(SOURCE &Source)
+  {
+    while (!ReadCell(Source)) {
+      if (IsStop()) return false;
+      if (IsEoR()) NextRow();
+    }
+
+    return true;
+  }
+
+  template <typename SOURCE>
+  bool ReadCell(SOURCE &Source, bool bThroughRows)
+  {
+    if (bThroughRows) return ReadCellThroughRows(Source);
+                 else return ReadCell(Source);
+  }
+
+  template <typename SOURCE, typename VISITOR>
+  bool ReadCell(SOURCE &Source, VISITOR &Visitor, bool bThroughRows)
+  {
+    if (!ReadCell(Source, bThroughRows)) return false;
+    Visitor.Cell(m_Cell.Begin(), m_Cell.End(), GetCellNumber());
     return true;
   }
 
  public:
   template <typename SOURCE, typename VISITOR>
-  bool Cell(SOURCE &Source, VISITOR &Visitor)
+  bool ReadRow(SOURCE &Source, VISITOR &Visitor)
   {
-    while (m_Input.Iteration(Source, m_Cell));
-
-    if (m_Input.IsEoC())
-      Visitor.Cell(m_Cell.Begin(), m_Cell.End(), m_Input.GetCellNumber());
-
-    return m_Input.NextCell();
-  }
-
-  template <typename SOURCE, typename VISITOR>
-  bool Row(SOURCE &Source, VISITOR &Visitor)
-  {
-    while (Cell(Source, Visitor)) ;
-    return m_Input.NextRow();
-  }
-
-  template <typename SOURCE, typename VISITOR>
-  bool ReadRow(SOURCE &Source, VISITOR &Visitor) // return false if failed to read row
-  {
-    if (m_Input.IsEoF()) return false;
-
-    while (Cell(Source, Visitor)) ;
-    m_Input.NextRow();
+    if (IsStop()) return false;
+    if (IsEoR()) NextRow();
+    while (ReadCell(Source, Visitor, false)) ;
     return true;
   }
 
  public:
   template <typename SOURCE, typename VISITOR>
-  bool FullRow(SOURCE &Source, VISITOR &Visitor)
+  bool ReadFullRow(SOURCE &Source, VISITOR &Visitor)
   {
-    Visitor.RowBegin(m_Input.GetRowNumber());
-    const bool bRes=Row(Source, Visitor);
+    if (IsStop()) return false;
+
+    Visitor.RowBegin(GetRowNumber());
+    const bool bRes=ReadRow(Source, Visitor);
     Visitor.RowEnd();
     return bRes;
   }
 
   template <typename SOURCE, typename VISITOR>
-  void operator()(SOURCE &Source, VISITOR &Visitor)
+  void ReadAll(SOURCE &Source, VISITOR &Visitor)
   {
-    while (FullRow(Source, Visitor)) ;
+    while (ReadFullRow(Source, Visitor)) ;
   }
 
  public:
@@ -192,30 +203,30 @@ class TCsvIterator {
                   TCharTag  ct,
                   VISITOR  &Visitor)
   {
-    if (m_Input.Iteration(ch, ct, m_Cell)) return true;
+    if (ProcessChar(ch, ct)) return true;
 
-    const int nRow=m_Input.GetRowNumber();
-    const int nCell=m_Input.GetCellNumber();
+    const int nRow=GetRowNumber();
+    const int nCell=GetCellNumber();
 
     if (nCell==0) Visitor.RowBegin(nRow);
 
-    if (m_Input.IsEoC())
+    if (IsEoC())
       Visitor.Cell(m_Cell.Begin(), m_Cell.End(), nCell);
 
-    if (m_Input.NextCell()) return true;
+    if (NextCell()) return true;
 
     Visitor.RowEnd();
 
-    return m_Input.NextRow();
+    return NextRow();
   }
 
-
  private:
-  typedef TFsm<TFsmDescr> TFsm1;
-  TInput<TFsm1> m_Input;
-
- private:
+  FSM  m_Fsm;
   CELL m_Cell;
+
+ private:
+  TCounter m_cntFld;
+  TCounter m_cntRec;
 };
 
 

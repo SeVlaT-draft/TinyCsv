@@ -1,6 +1,6 @@
 // SeVlaT, 12.03.2015
 //
-#include <sstream>"
+#include <sstream>
 
 #include "CmdLine.h"
 

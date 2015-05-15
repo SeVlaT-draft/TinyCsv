@@ -36,15 +36,15 @@ enum TActionFlags {
   oTWsp = 0x0040,  // Whitespace, that may be trailing
 
 // End marks
-  oEoC  = 0x0100,  // End-of-Cell, buffer contains cell's text
-  oEoR  = 0x0200,  // End-of-Row
-  oEoF  = 0x0400,  // End-of-File
+  oEc   = 0x0100,  // End-of-Cell, buffer contains cell's text
+  oEr   = 0x0200,  // End-of-Row
+  oEf   = 0x0400,  // End-of-File
 
 // Errors
-  oErTx = 0x1000,  // Error in text cell
-  oErSt = 0x2000,  // Error in stopped state
-  oErQ0 = 0x4000,  // Error in escaped cell (inside quotes)
-  oErQ1 = 0x8000,  // Error in escaped cell (after closing quote)
+  oFTxt = 0x1000,  // Error in text cell
+  oFStp = 0x2000,  // Error in stopped state
+  oFQu0 = 0x4000,  // Error in escaped cell (inside quotes)
+  oFQu1 = 0x8000,  // Error in escaped cell (after closing quote)
 
 // Combined flags
   oALW  = oAdd | oLWsp,
@@ -54,15 +54,16 @@ enum TActionFlags {
   oNALW = oNew | oALW,
   oNATW = oNew | oATW,
 
-  oNEoC = oNew | oEoC,
-  oNEoR = oNew | oEoR,
+  oNEc  = oNew | oEc,
+  oNEr  = oNew | oEr,
+  oNEcf = oNew | oEc | oEf,
 
-  oEoCR = oEoC | oEoR,
-  oEoCF = oEoC | oEoF,
+  oEcr  = oEc  | oEr,
+  oEcf  = oEc  | oEf,
 
-// Combined flags
-  oErr  = oErTx | oErSt | oErQ0 | oErQ1,
-  oStop = oErr  | oEoF
+// Masks. 
+  oMskFault= oFTxt | oFStp | oFQu0 | oFQu1,
+  oMskStop = oMskFault | oEf
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -99,19 +100,19 @@ struct TErrorAction {
   const bool bError;
 
   explicit TErrorAction(TActionFlags sf)
-   : bErTxt((sf & oErTx)!=0),
-     bErQu0((sf & oErQ0)!=0),
-     bErQu1((sf & oErQ1)!=0),
-     bErEof((sf & oErSt)!=0),
+   : bErTxt((sf & oFTxt)!=0),
+     bErQu0((sf & oFQu0)!=0),
+     bErQu1((sf & oFQu1)!=0),
+     bErEof((sf & oFStp)!=0),
 
-     bError((sf & oErr )!=0)  {} //!!!!!
+     bError((sf & oMskFault )!=0)  {} //!!!!!
 
   TActionFlags Flags() const
   {
-    const unsigned int dw = (bErTxt? oErTx: 0) |
-                            (bErQu0? oErQ0: 0) |
-                            (bErQu1? oErQ1: 0) |
-                            (bErEof? oErSt: 0);
+    const unsigned int dw = (bErTxt? oFTxt: 0) |
+                            (bErQu0? oFQu0: 0) |
+                            (bErQu1? oFQu1: 0) |
+                            (bErEof? oFStp: 0);
 
     return static_cast<TActionFlags>(dw);
   }
@@ -131,19 +132,19 @@ struct TAction {
    : BufAction(sf),
      ErrorAction(sf),
 
-     bEoC  ((sf & oEoC )!=0),
-     bEoR  ((sf & oEoR )!=0),
-     bEoF  ((sf & oEoF )!=0),
-     bStop ((sf & oStop)!=0)  {} //!!!!!
+     bEoC  ((sf & oEc )!=0),
+     bEoR  ((sf & oEr )!=0),
+     bEoF  ((sf & oEf )!=0),
+     bStop ((sf & oMskStop)!=0)  {} //!!!!!
 
   TActionFlags Flags() const
   {
     const unsigned int dwBA = BufAction.Flags();
     const unsigned int dwEA = ErrorAction.Flags();
 
-    const unsigned int dw = (bEoC  ? oEoC : 0) |
-                            (bEoR  ? oEoR : 0) |
-                            (bEoF  ? oEoF : 0);
+    const unsigned int dw = (bEoC  ? oEc : 0) |
+                            (bEoR  ? oEr : 0) |
+                            (bEoF  ? oEf : 0);
 
     return static_cast<TActionFlags>(dw | dwBA | dwEA);
   }
