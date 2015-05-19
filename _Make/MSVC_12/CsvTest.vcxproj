@@ -18,11 +18,11 @@
     <ClCompile Include="..\..\Tests\z.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Cell.h" />
     <ClInclude Include="..\..\Char.h" />
     <ClInclude Include="..\..\Csv.h" />
     <ClInclude Include="..\..\Debug.h" />
     <ClInclude Include="..\..\Escape.h" />
-    <ClInclude Include="..\..\Field.h" />
     <ClInclude Include="..\..\Fsm.h" />
     <ClInclude Include="..\..\Input.h" />
     <ClInclude Include="..\..\Output.h" />

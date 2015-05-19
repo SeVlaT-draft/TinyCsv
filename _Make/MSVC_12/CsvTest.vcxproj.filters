@@ -46,9 +46,6 @@
     <ClInclude Include="..\..\Ver.h">
       <Filter>Header Files\TinyCsv</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Field.h">
-      <Filter>Header Files\TinyCsv</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Escape.h">
       <Filter>Header Files\TinyCsv</Filter>
     </ClInclude>
@@ -63,6 +60,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Tests\FsmChecker.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Cell.h">
+      <Filter>Header Files\TinyCsv</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
