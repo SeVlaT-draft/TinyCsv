@@ -8,6 +8,7 @@
 #include "Escape.h"
 #include "Char.h"
 #include "Cell.h"
+#include "Fsm.h"
 #include "Input.h"
 #include "Source.h"
 #include "Output.h"

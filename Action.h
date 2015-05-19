@@ -55,7 +55,7 @@ enum TActionFlags {
   oNATW = oNew | oATW,
 
   oNEc  = oNew | oEc,
-  oNEr  = oNew | oEr,
+  oNEcr = oNew | oEc | oEr,
   oNEcf = oNew | oEc | oEf,
 
   oEcr  = oEc  | oEr,
