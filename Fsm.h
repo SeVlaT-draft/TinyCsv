@@ -55,7 +55,7 @@ class TFsmDescr {
   const TState sHead; // A dummy state, just to be a header for transition table
 
   const TState sStart;                          // Start state
-  const TState sEc, sEr, sEcr, sNEc, sNEr;      // End-of-Cell, End-of-Row states
+  const TState sEc, sEr, sEcr, sNEc, sNEcr;     // End-of-Cell, End-of-Row states
   const TState sWsp0, sWsp, sTxt0, sTxt, sTWsp; // States in ordinary cells
   const TState sQHead, sQTxt, sQuote, sQTail;   // States in quoted cells
   const TState sEf, sEcf, sNEcf;                // End-of-File states
@@ -66,12 +66,12 @@ class TFsmDescr {
    :
      sHead ("",        oNone,   cEoF,   cEoL,   cSep,   cQte,   cWsp,   cSmb  ),
 
-     sStart("sStart",  oNone,   sEf,    sNEr,   sNEc,   sQHead, sWsp0,  sTxt0 ),
-     sEc   ("sEc",     oEc,     sNEcf,  sNEr,   sNEc,   sQHead, sWsp0,  sTxt0 ),
-     sNEc  ("sNEc",    oNEc,    sEf,    sNEr,   sNEc,   sQHead, sWsp0,  sTxt0 ),
-     sEr   ("sEr",     oEr,     sEf,    sNEr,   sNEc,   sQHead, sWsp0,  sTxt0 ),
-     sNEr  ("sNEr",    oNEr,    sEf,    sNEr,   sNEc,   sQHead, sWsp0,  sTxt0 ),
-     sEcr  ("sEcr",    oEcr,    sEf,    sNEr,   sNEc,   sQHead, sWsp0,  sTxt0 ),
+     sStart("sStart",  oNone,   sEf,    sNEcr,  sNEc,   sQHead, sWsp0,  sTxt0 ),
+     sEc   ("sEc",     oEc,     sNEcf,  sNEcr,  sNEc,   sQHead, sWsp0,  sTxt0 ),
+     sNEc  ("sNEc",    oNEc,    sEf,    sNEcr,  sNEc,   sQHead, sWsp0,  sTxt0 ),
+     sEr   ("sEr",     oEr,     sEf,    sNEcr,  sNEc,   sQHead, sWsp0,  sTxt0 ),
+     sNEcr ("sNEcr",   oNEcr,   sEf,    sNEcr,  sNEc,   sQHead, sWsp0,  sTxt0 ),
+     sEcr  ("sEcr",    oEcr,    sEf,    sNEcr,  sNEc,   sQHead, sWsp0,  sTxt0 ),
 
      sWsp0 ("sWsp0",   oNALW,   sEcf,   sEcr,   sEc,    sQHead, sWsp,   sTxt  ),
      sWsp  ("sWsp",    oALW,    sEcf,   sEcr,   sEc,    sQHead, sWsp,   sTxt  ),
